@@ -46,25 +46,40 @@
                             <div>
                                 <form class="busca-avancada" action="<?php echo URL; ?>solr/enviarArquivo" method="POST" enctype="multipart/form-data">
                                     <div class="form-group">
-                                        <label>Arquivo</label>
+                                        <label>Arquivo-texto</label>
                                         <input class="form-control" type="file" name="fileToUpload" value="" required />
                                     </div>
+									<div class="form-group">
+                                        <label>Arquivo-imagem</label>
+                                        <input class="form-control" type="file" name="imageToUpload" value="" />
+                                    </div>
                                     <div class="form-group">
-                                        <label>Título</label>
-                                        <input class="form-control" type="text" name="title" value="" />
+                                        <label>Signatário</label>
+                                        <input class="form-control" type="text" name="signer" value="" required/>
+                                    </div>
+									<div class="form-group">
+                                        <label>Destinatário</label>
+                                        <input class="form-control" type="text" name="receiver" value="" required/>
                                     </div>
                                     <div class="form-group">
                                         <label>Autor</label>
-                                        <input class="form-control" type="text" name="author" value="" />
+                                        <input class="form-control" type="text" name="author" value="" required/>
                                     </div>
                                     <div class="form-group">
-                                        <label>Data</label>
-                                        <input class="form-control" type="date" name="fileDate" value="" />
+                                        <label>Data de produção</label>
+                                        <input class="form-control" type="date" name="fileDate" value="" required/>
+                                    </div>
+									<div class="form-group">
+                                        <label>Identificação</label>
+                                        <input class="form-control" type="text" name="identification" value="" required/>
+                                    </div>
+									<div class="form-group">
+                                        <label>Setor</label>
+                                        <input class="form-control" type="text" name="sector" value="" required/>
                                     </div>
                                     <div class="form-group">
-                                        <label>Categoria</label>
+                                        <label>Espécie</label>
                                         <select class="form-control" name="category">
-                                            <option value=""></option>
                                             <option value="Ata de Congregação">Ata de Congregação</option>
                                             <option value="Pauta de Congregação">Pauta de Congregação</option>
                                             <option value="Deliberação de Congregação">Deliberação de Congregação</option>
@@ -77,8 +92,22 @@
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label>Palavras-chave</label>
-                                        <input class="form-control" type="text" name="keywords" value="" />
+                                        <label>Assunto</label>
+                                        <input class="form-control" type="text" name="subject" value="" required/>
+                                    </div>
+									<div class="form-group">
+                                        <label>Sigilo</label>
+                                        <select class="form-control" name="secret">
+                                            <option value="sim">SIM</option>
+                                            <option value="nao">NÃO</option>                             
+                                        </select>
+                                    </div>
+									<div class="form-group">
+                                        <label>Anexo</label>
+                                        <select class="form-control" name="attachment">
+                                            <option value="sim">SIM</option>
+                                            <option value="nao">NÃO</option>                             
+                                        </select>
                                     </div>
                                     <div class="form-group">
                                         <input type="submit" name="submit_add_file" value="Enviar" />

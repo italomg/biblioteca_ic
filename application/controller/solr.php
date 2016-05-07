@@ -221,15 +221,43 @@ class Solr extends Controller
             $doc = $query->createDocument();
             $doc->id = '/'.$fname;
             $doc->file_path_s = $fpath;
-            if(!empty($_POST["author"])) $doc->author_txt_pt = $_POST["author"];
-            if(!empty($_POST["fileDate"])) $doc->date_s = $_POST["fileDate"];
-            if(!empty($_POST["title"])) $doc->title_txt_pt = $_POST["title"];
-            $doc->link_s = URL . 'downloads/' . $fname;
-            if(!empty($_POST["category"])) $doc->category_txt_pt = $_POST["category"];
-            if(!empty($_POST["keywords"])) $doc->keywords_txt_pt = $_POST["keywords"];
+            if (!empty($_POST["subject"])) {
+            	$doc->subject_txt_pt = $_POST["subject"];
+            }
+            if (!empty($_POST["receiver"])) {
+            	$doc->receiver_txt_pt = $_POST["receiver"];
+            }
+            if (!empty($_POST["sector"])) {
+            	$doc->sector_txt_pt = $_POST["sector"];
+            }
+            if (!empty($_POST["identification"])) {
+            	$doc->identification_txt_pt = $_POST["identification"];
+            }
+            if (!empty($_POST["signer"])) {
+            	$doc->signer_txt_pt = $_POST["signer"];
+            }
+            if (!empty($_POST["author"])) {
+            	$doc->author_txt_pt = $_POST["author"];
+            }
+            if (!empty($_POST["fileDate"])){
+            	$doc->date_s = $_POST["fileDate"];
+            }
+            if (!empty($_POST["title"])){
+            	$doc->title_txt_pt = $_POST["title"];
+            }
+            if (!empty($_POST["category"])){
+            	$doc->category_txt_pt = $_POST["category"];
+            }
+            if (!empty($_POST["secret"])) {
+            	$doc->secret_txt_pt = $_POST["secret"];
+            }
+            if (!empty($_POST["attachment"])) {
+            	$doc->attachment_txt_pt = $_POST["attachment"];
+            }
             $doc->indexation_date_dt = date('Y-m-d\TH:i:s\Z');
+            $doc->link_s = URL . 'downloads/' . $fname;
             $query->setDocument($doc);
-
+            
             // this executes the query and returns the result
             $result = $client->extract($query);
 
@@ -295,13 +323,40 @@ class Solr extends Controller
             $doc = $query->createDocument();
             $doc->id = '/'.$id;
             $doc->file_path_s = $fpath;
-            if(!empty($_POST["author"])) $doc->author_txt_pt = $_POST["author"];
-            if(!empty($_POST["fileDate"])) $doc->date_s = $_POST["fileDate"];
-            if(!empty($_POST["title"])) $doc->title_txt_pt = $_POST["title"];
+        	if (!empty($_POST["subject"])) {
+            	$doc->subject_txt_pt = $_POST["subject"];
+            }
+            if (!empty($_POST["receiver"])) {
+            	$doc->receiver_txt_pt = $_POST["receiver"];
+            }
+            if (!empty($_POST["sector"])) {
+            	$doc->sector_txt_pt = $_POST["sector"];
+            }
+            if (!empty($_POST["identification"])) {
+            	$doc->identification_txt_pt = $_POST["identification"];
+            }
+            if (!empty($_POST["signer"])) {
+            	$doc->signer_txt_pt = $_POST["signer"];
+            }
+            if (!empty($_POST["author"])) {
+            	$doc->author_txt_pt = $_POST["author"];
+            }
+            if (!empty($_POST["fileDate"])){
+            	$doc->date_s = $_POST["fileDate"];
+            }
+            if (!empty($_POST["title"])){
+            	$doc->title_txt_pt = $_POST["title"];
+            }
+            if (!empty($_POST["category"])){
+            	$doc->category_txt_pt = $_POST["category"];
+            }
+            if (!empty($_POST["secret"])) {
+            	$doc->secret_txt_pt = $_POST["secret"];
+            }
+            if (!empty($_POST["attachment"])) {
+            	$doc->attachment_txt_pt = $_POST["attachment"];
+            }
             $doc->link_s = URL . 'downloads/' . $fname;
-            if(!empty($_POST["category"])) $doc->category_txt_pt = $_POST["category"];
-            if(!empty($_POST["keywords"])) $doc->keywords_txt_pt = $_POST["keywords"];
-            $doc->indexation_date_dt = date('Y-m-d\TH:i:s\Z');
             $query->setDocument($doc);
 
             // this executes the query and returns the result

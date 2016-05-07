@@ -51,19 +51,31 @@
                             <div>
                                 <form class="busca-avancada" action="<?php echo URL; ?>solr/editarArquivo/<?php echo $id; ?>" method="POST">
                                     <div class="form-group">
-                                        <label>Título</label>
-                                        <input class="form-control" type="text" name="title" value="<?php echo (isset($document["title_txt_pt"])) ? $document["title_txt_pt"] : ''; ?>" />
-                                    </div>
-                                    <div class="form-group">
                                         <label>Autor</label>
-                                        <input class="form-control" type="text" name="author" value="<?php echo (isset($document["author_txt_pt"])) ? $document["author_txt_pt"] : ''; ?>" />
+                                        <input class="form-control" type="text" name="author" value="<?php echo (isset($document["author_txt_pt"])) ? $document["author_txt_pt"] : ''; ?>" required/>
                                     </div>
                                     <div class="form-group">
-                                        <label>Data</label>
-                                        <input class="form-control" type="date" name="fileDate" value="<?php echo (isset($document["date_s"])) ? $document["date_s"] : ''; ?>" />
+                                        <label>Data de producão</label>
+                                        <input class="form-control" type="date" name="fileDate" value="<?php echo (isset($document["date_s"])) ? $document["date_s"] : ''; ?>" required/>
                                     </div>
                                     <div class="form-group">
-                                        <label>Categoria</label>
+                                        <label>Signatário</label>
+                                        <input class="form-control" type="text" name="signer" value="<?php echo (isset($document["signer_txt_pt"])) ? $document["signer_txt_pt"] : ''; ?>" required/>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Destinatário</label>
+                                        <input class="form-control" type="text" name="receiver" value="<?php echo (isset($document["receiver_txt_pt"])) ? $document["receiver_txt_pt"] : ''; ?>" required/>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Setor</label>
+                                        <input class="form-control" type="text" name="sector" value="<?php echo (isset($document["sector_txt_pt"])) ? $document["sector_txt_pt"] : ''; ?>" required/>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Identificacão</label>
+                                        <input class="form-control" type="text" name="identification" value="<?php echo (isset($document["identification_txt_pt"])) ? $document["identification_txt_pt"] : ''; ?>" required/>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Espécie</label>
                                         <select class="form-control" name="category">
                                             <option value=""></option>
                                             <option <?php if(isset($document["category_txt_pt"]) && $document["category_txt_pt"] == "Ata de Congregação") echo 'selected'; ?> value="Ata de Congregação">Ata de Congregação</option>
@@ -78,8 +90,22 @@
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label>Palavras-chave</label>
-                                        <input class="form-control" type="text" name="keywords" value="<?php echo (isset($document["keywords_txt_pt"])) ? $document["keywords_txt_pt"] : ''; ?>" />
+                                        <label>Assunto</label>
+                                        <input class="form-control" type="text" name="subject" value="<?php echo (isset($document["subject_txt_pt"])) ? $document["subject_txt_pt"] : ''; ?>" required/>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Sigilo</label>
+                                        <select class="form-control" name="secret">
+                                            <option <?php if(isset($document["secret_txt_pt"]) && $document["secret_txt_pt"] == "sim") echo 'selected'; ?> value="sim">SIM</option>
+                                            <option <?php if(isset($document["secret_txt_pt"]) && $document["secret_txt_pt"] == "nao") echo 'selected'; ?> value="nao">NÃO</option>                             
+                                        </select>
+                                    </div>
+									<div class="form-group">
+                                        <label>Anexo</label>
+                                        <select class="form-control" name="attachment">
+                                            <option <?php if(isset($document["attachment_txt_pt"]) && $document["attachment_txt_pt"] == "sim") echo 'selected'; ?> value="sim">SIM</option>
+                                            <option <?php if(isset($document["attachment_txt_pt"]) && $document["attachment_txt_pt"] == "nao") echo 'selected'; ?> value="nao">NÃO</option>                            
+                                        </select>
                                     </div>
                                     <div class="form-group">
                                         <input type="submit" name="submit_edit_file" value="Enviar" />

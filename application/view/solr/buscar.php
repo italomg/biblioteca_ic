@@ -63,23 +63,39 @@
                             <div>
                                 <form class="busca-avancada" action="<?php echo URL; ?>solr/buscaAvancada" method="POST">
                                     <div class="form-group">
-                                        <label>Título</label>
-                                        <input class="form-control" type="text" name="title" value="" />
+                                        <label>Conteúdo</label>
+                                        <input class="form-control" type="text" name="content" value="" />
                                     </div>
                                     <div class="form-group">
                                         <label>Autor</label>
                                         <input class="form-control" type="text" name="author" value="" />
                                     </div>
-                                    <div class="form-group">
-                                        <label>Conteúdo</label>
-                                        <input class="form-control" type="text" name="content" value="" />
+                                     <div class="form-group">
+                                        <label>Signatário</label>
+                                        <input class="form-control" type="text" name="signer" value=""/>
+                                    </div>
+									<div class="form-group">
+                                        <label>Destinatário</label>
+                                        <input class="form-control" type="text" name="receiver" value=""/>
                                     </div>
                                     <div class="form-group">
-                                        <label>Data</label>
-                                        <input class="form-control" type="date" name="date" value="" />
+                                        <label>Autor</label>
+                                        <input class="form-control" type="text" name="author" value=""/>
                                     </div>
                                     <div class="form-group">
-                                        <label>Categoria</label>
+                                        <label>Data de produção</label>
+                                        <input class="form-control" type="date" name="fileDate" value=""/>
+                                    </div>
+									<div class="form-group">
+                                        <label>Identificação</label>
+                                        <input class="form-control" type="text" name="identification" value=""/>
+                                    </div>
+									<div class="form-group">
+                                        <label>Setor</label>
+                                        <input class="form-control" type="text" name="sector" value=""/>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Espécie</label>
                                         <select class="form-control" name="category">
                                             <option value=""></option>
                                             <option value="Ata de Congregação">Ata de Congregação</option>
@@ -94,8 +110,24 @@
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label>Palavras-chave</label>
-                                        <input class="form-control" type="text" name="keywords" value="" />
+                                        <label>Assunto</label>
+                                        <input class="form-control" type="text" name="subject" value="" />
+                                    </div>
+									<div class="form-group">
+                                        <label>Sigilo</label>
+                                        <select class="form-control" name="secret">
+                                            <option value=""></option>
+                                            <option value="sim">SIM</option>
+                                            <option value="nao">NÃO</option>                             
+                                        </select>
+                                    </div>
+									<div class="form-group">
+                                        <label>Anexo</label>
+                                        <select class="form-control" name="attachment">
+                                        	<option value=""></option>
+                                            <option value="sim">SIM</option>
+                                            <option value="nao">NÃO</option>                             
+                                        </select>
                                     </div>
                                     <div class="form-group">
                                         <input type="submit" name="submit_advanced_search" value="Buscar" />
