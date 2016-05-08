@@ -255,6 +255,9 @@ class Solr extends Controller
             	$doc->attachment_txt_pt = $_POST["attachment"];
             }
             $doc->indexation_date_dt = date('Y-m-d\TH:i:s\Z');
+            $doc->indexationYear_s  = date('Y');
+            $doc->indexationMonth_s = date('m');
+            $doc->indexationYear_s  = date('d');
             $doc->link_s = URL . 'downloads/' . $fname;
             $query->setDocument($doc);
             
@@ -343,6 +346,10 @@ class Solr extends Controller
             }
             if (!empty($_POST["fileDate"])){
             	$doc->date_s = $_POST["fileDate"];
+            	$arr = explode('-', $_POST["fileDate"]);
+            	$doc->dateYear_s  = $arr[0];
+            	$doc->dateMonth_s = $arr[1];
+            	$doc->dateDay_s   = $arr[2];
             }
             if (!empty($_POST["title"])){
             	$doc->title_txt_pt = $_POST["title"];

@@ -67,10 +67,6 @@
                                         <input class="form-control" type="text" name="content" value="" />
                                     </div>
                                     <div class="form-group">
-                                        <label>Autor</label>
-                                        <input class="form-control" type="text" name="author" value="" />
-                                    </div>
-                                     <div class="form-group">
                                         <label>Signatário</label>
                                         <input class="form-control" type="text" name="signer" value=""/>
                                     </div>
