@@ -7,6 +7,7 @@
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="<?php echo URL; ?>js/jquery.min.js"></script>
 <script src="<?php echo URL; ?>js/jquery.toaster.js"></script>
+<script type="text/javascript" src="<?php echo URL; ?>js/biblioteca.js" charset="UTF-8"></script>  
 
 <!---- start-smoth-scrolling---->
 <script type="text/javascript">
