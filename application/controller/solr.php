@@ -219,7 +219,7 @@ class Solr extends Controller
             $fpath = $this->fileUpload('userfile', $creation, 0);
             $upload2 = $this->fileUpload('userfile', $creation, 1);
 
-            $this->indexaArquivo($fpath, $fname);
+            $this->indexaArquivo($fpath, $fname, false);
         }
 
         // where to go after file has been added
@@ -255,7 +255,7 @@ class Solr extends Controller
 			
 			foreach ( $flist as $f ) {
                 rename($upload_dir.$f, $dest_dir.$f);
-				$this->indexaArquivo($dest_dir.$f, $f);
+				$this->indexaArquivo($dest_dir.$f, $f, false);
 			}
 		}
 		
@@ -268,7 +268,8 @@ class Solr extends Controller
 		header ( "Pragma: no-cache" );
 	}
     
-    function indexaArquivo($fpath, $fname ) 
+	// edicao eh um booleano que indica se a funcao que chamou foi a editaArquivo()
+    function indexaArquivo($fpath, $fname, $edicao ) 
     {
          // create a client instance
         $client = new Solarium\Client($this->config);
@@ -322,11 +323,15 @@ class Solr extends Controller
         if (!empty($_POST["attachment"])) {
             $doc->attachment_txt_pt = $_POST["attachment"];
         }
-        $doc->indexing_date_dt = date('Y-m-d\TH:i:s\Z');
-        $doc->indexingYear_s  = date('Y');
-        $doc->indexingMonth_s = date('m');
-        $doc->indexingDay_s  = date('d');
-        $doc->link_s = URL . 'downloads/' . $fname;
+		
+		// nao pega a data de indexacao na edicao de arquivo
+		if(!$edicao) {
+			$doc->indexing_date_dt = date('Y-m-d\TH:i:s\Z');
+			$doc->indexingYear_s  = date('Y');
+			$doc->indexingMonth_s = date('m');
+			$doc->indexingDay_s  = date('d');
+			$doc->link_s = URL . 'downloads/' . $fname;
+		}
 
         $query->setDocument($doc);
         
@@ -353,7 +358,20 @@ class Solr extends Controller
     {
         // if we have POST data
         if (isset($_POST["submit_edit_file"])) {
-            // create a client instance
+			
+			$arr = explode('/', $id);
+
+            $fname = end($arr);
+
+            $fpath = 'download/' . $fname;
+			
+			
+            $this->indexaArquivo($fpath, $fname, true);
+			
+			
+			
+			/*
+			// create a client instance
             $client = new Solarium\Client($this->config);
 
             // get an update query instance
@@ -438,10 +456,11 @@ class Solr extends Controller
 
             // this executes the query and returns the result
             $result = $client->update($update);
+			*/
         }
 
         // where to go after file has been edited
-        header('location: ' . URL . 'solr/detalhes/' . $doc->id);
+        header('location: ' . URL . 'solr/detalhes/' . $fname);
 
         // Cache dump
         header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
