@@ -202,10 +202,10 @@ class Solr extends Controller
             date_default_timezone_set('America/Sao_Paulo');
             $creation = date('Y-m-d_H-i-s');
 
-            $fname = basename($_FILES['fileToUpload']['name']);
+            $fname = basename($_FILES['userfaile']['name'][0]);
 
-            $fpath = $this->fileUpload('upload', $creation, 0);
-            $upload2 = $this->fileUpload('upload', $creation, 1);
+            $fpath = $this->fileUpload('userfile', $creation, 0);
+            $upload2 = $this->fileUpload('userfile', $creation, 1);
 
             // create a client instance
             $client = new Solarium\Client($this->config);
@@ -264,14 +264,6 @@ class Solr extends Controller
             $doc->indexationMonth_s = date('m');
             $doc->indexationYear_s  = date('d');
             $doc->link_s = URL . 'downloads/' . $fname;
-            move_uploaded_file($_FILES['fileToUpload']['tmp_name'], $_FILES['fileToUpload']['name']);
-            //upload image file
-            if (isset($_FILES['imageToUpload'])) {
-            	//echo "teste";
-            	//$target_dir = 'download/';
-            	//$target_file = URL . $target_dir . basename($_FILES['imagetoUpload']['name']);
-            	
-            }
             
             
             $query->setDocument($doc);
