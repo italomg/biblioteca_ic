@@ -231,8 +231,8 @@ class Solr extends Controller
         header("Pragma: no-cache");
     }
     
-    	/**
-	 * ACTION: enviarArquivo
+    /**
+	 * ACTION: enviarArquivoZip
 	 * This method handles what happens when you move to http://yourproject/solr/enviarArquivoZip
 	 * IMPORTANT: This is not a normal page, it's an ACTION that handles a POST request.
 	 */
@@ -270,7 +270,7 @@ class Solr extends Controller
     
     function indexaArquivo($fpath, $fname ) 
     {
-        // create a client instance
+         // create a client instance
         $client = new Solarium\Client($this->config);
 
         // get an extract query instance and add settings
@@ -327,7 +327,7 @@ class Solr extends Controller
         $doc->indexingMonth_s = date('m');
         $doc->indexingDay_s  = date('d');
         $doc->link_s = URL . 'downloads/' . $fname;
-        
+
         $query->setDocument($doc);
         
         // this executes the query and returns the result
