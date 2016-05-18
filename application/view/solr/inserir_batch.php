@@ -10,7 +10,8 @@
                     <ul class="nav" id="nav">
                       <li><a href="<?php echo URL; ?>">Home</a></li>
                       <li><a href="<?php echo URL; ?>solr/pesquisar">Pesquisar</a></li>
-                      <li class="current"><a href="<?php echo URL; ?>solr/inserir">Inserir</a></li>
+                      <li><a href="<?php echo URL; ?>solr/inserir">Inserir</a></li>
+                      <li class="current"><a href="<?php echo URL; ?>solr/inserir_batch">Inserir Batch</a></li>
                       <li><a href="<?php echo URL; ?>solr/listar">Listar Todos</a></li>
                       <li><a href="<?php echo URL; ?>solr/contato">Contato</a></li>
                       <div class="clear"></div>
