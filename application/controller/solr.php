@@ -202,7 +202,7 @@ class Solr extends Controller
             date_default_timezone_set('America/Sao_Paulo');
             $creation = date('Y-m-d_H-i-s');
 
-            $fname = basename($_FILES['userfaile']['name'][0]);
+            $fname = basename($_FILES['userfile']['name'][0]);
 
             $fpath = $this->fileUpload('userfile', $creation, 0);
             $upload2 = $this->fileUpload('userfile', $creation, 1);
