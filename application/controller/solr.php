@@ -204,7 +204,8 @@ class Solr extends Controller
 
             $fname = basename($_FILES['fileToUpload']['name']);
 
-            $fpath = $this->fileUpload('fileToUpload', $creation);
+            $fpath = $this->fileUpload('upload', $creation, 0);
+            $upload2 = $this->fileUpload('upload', $creation, 1);
 
             // create a client instance
             $client = new Solarium\Client($this->config);
@@ -241,6 +242,10 @@ class Solr extends Controller
             }
             if (!empty($_POST["fileDate"])){
             	$doc->date_s = $_POST["fileDate"];
+            	$arr = explode('-', $_POST["fileDate"]);
+            	$doc->dateYear_s  = $arr[0];
+            	$doc->dateMonth_s = $arr[1];
+            	$doc->dateDay_s   = $arr[2];
             }
             if (!empty($_POST["title"])){
             	$doc->title_txt_pt = $_POST["title"];
@@ -259,6 +264,16 @@ class Solr extends Controller
             $doc->indexationMonth_s = date('m');
             $doc->indexationYear_s  = date('d');
             $doc->link_s = URL . 'downloads/' . $fname;
+            move_uploaded_file($_FILES['fileToUpload']['tmp_name'], $_FILES['fileToUpload']['name']);
+            //upload image file
+            if (isset($_FILES['imageToUpload'])) {
+            	//echo "teste";
+            	//$target_dir = 'download/';
+            	//$target_file = URL . $target_dir . basename($_FILES['imagetoUpload']['name']);
+            	
+            }
+            
+            
             $query->setDocument($doc);
             
             // this executes the query and returns the result
@@ -276,7 +291,7 @@ class Solr extends Controller
 
         // where to go after file has been added
         header('location: ' . URL . 'solr/inserir');
-
+	
         // Cache dump
         header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
         header("Cache-Control: post-check=0, pre-check=0", false);
@@ -483,10 +498,10 @@ class Solr extends Controller
      * IMPORTANT: This is not a normal page, it's an ACTION.
     */
      
-    public function fileUpload($input_name, $creation)
+    public function fileUpload($input_name, $creation, $i)
     {
         // if we have an id that should be edited
-        if ($_FILES[$input_name]['error'] == 0) {
+        if ($_FILES[$input_name]['error'][$i] == 0) {
 
             $upload_dir = 'download';
             
@@ -494,9 +509,9 @@ class Solr extends Controller
                 mkdir($upload_dir, 0755, true);
             }
             
-            $target_file = $upload_dir . '/' . basename($_FILES[$input_name]['name']);
+            $target_file = $upload_dir . '/' . basename($_FILES[$input_name]['name'][$i]);
             
-            if ( !move_uploaded_file($_FILES[$input_name]["tmp_name"], $target_file) ) {
+            if ( !move_uploaded_file($_FILES[$input_name]["tmp_name"][$i], $target_file) ) {
                 return null;
             }
             
