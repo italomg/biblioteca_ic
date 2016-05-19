@@ -9,6 +9,8 @@
  * This is really weird behaviour, but documented here: http://php.net/manual/en/language.oop5.decon.php
  *
  */
+
+$imageLink = "";
 class Solr extends Controller
 {
     /**
@@ -217,9 +219,13 @@ class Solr extends Controller
             $fname = basename($_FILES['userfile']['name'][0]);
 
             $fpath = $this->fileUpload('userfile', $creation, 0);
-            $upload2 = $this->fileUpload('userfile', $creation, 1);
+            if (!empty($_FILES['userfile']['name'][1])) {
+            	$upload2 = $this->fileUpload('userfile', $creation, 1);
+            } else {
+            	$upload2 = "";
+            }
 
-            $this->indexaArquivo($fpath, $fname, false);
+            $this->indexaArquivo($fpath, $fname, false, $upload2);
         }
 
         // where to go after file has been added
@@ -255,7 +261,7 @@ class Solr extends Controller
 			
 			foreach ( $flist as $f ) {
                 rename($upload_dir.$f, $dest_dir.$f);
-				$this->indexaArquivo($dest_dir.$f, $f, false);
+				$this->indexaArquivo($dest_dir.$f, $f, false, "");
 			}
 		}
 		
@@ -269,7 +275,7 @@ class Solr extends Controller
 	}
     
 	// edicao eh um booleano que indica se a funcao que chamou foi a editaArquivo()
-    function indexaArquivo($fpath, $fname, $edicao ) 
+    function indexaArquivo($fpath, $fname, $edicao, $image ) 
     {
          // create a client instance
         $client = new Solarium\Client($this->config);
@@ -311,9 +317,6 @@ class Solr extends Controller
             $doc->dateMonth_s = $arr[1];
             $doc->dateDay_s   = $arr[2];
         }
-        if (!empty($_POST["title"])){
-            $doc->title_txt_pt = $_POST["title"];
-        }
         if (!empty($_POST["category"])){
             $doc->category_txt_pt = $_POST["category"];
         }
@@ -332,7 +335,10 @@ class Solr extends Controller
 			$doc->indexingDay_s  = date('d');
 			$doc->link_s = URL . 'downloads/' . $fname;
 		}
-
+		if ($image != "") {
+			$doc->teste_s = "passouaqui";
+			$doc->image_s = $image;
+		}
         $query->setDocument($doc);
         
         // this executes the query and returns the result
@@ -366,7 +372,7 @@ class Solr extends Controller
             $fpath = 'download/' . $fname;
 			
 			
-            $this->indexaArquivo($fpath, $fname, true);
+            $this->indexaArquivo($fpath, $fname, true,"");
 			
 			
 			
