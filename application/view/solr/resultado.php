@@ -76,7 +76,7 @@
                 $data = $arr[2].'/'.$arr[1].'/'.$arr[0];
               }
               else {
-                $data = "Não informado";
+                $data = "";
               }
 
               $arr = explode('/', $document["id"]);

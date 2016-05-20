@@ -68,6 +68,14 @@
                                         <input class="form-control" type="text" name="content" value="" />
                                     </div>
                                     <div class="form-group">
+                                        <label>Usuário (upload)</label>
+                                        <input class="form-control" type="text" name="user" value=""/>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Data (upload)</label>
+                                        <input class="form-control" type="date" name="uploadDate" value=""/>
+                                    </div>
+                                    <div class="form-group">
                                         <label>Signatário</label>
                                         <input class="form-control" type="text" name="signer" value=""/>
                                     </div>

@@ -329,14 +329,13 @@ class Solr extends Controller
 		
 		// nao pega a data de indexacao na edicao de arquivo
 		if(!$edicao) {
-			$doc->indexing_date_dt = date('Y-m-d\TH:i:s\Z');
+			$doc->indexingDate_s = date('Y-m-d');
 			$doc->indexingYear_s  = date('Y');
 			$doc->indexingMonth_s = date('m');
 			$doc->indexingDay_s  = date('d');
 			$doc->link_s = URL . 'downloads/' . $fname;
 		}
 		if ($image != "") {
-			$doc->teste_s = "passouaqui";
 			$doc->image_s = $image;
 		}
         $query->setDocument($doc);
@@ -374,95 +373,7 @@ class Solr extends Controller
 			
             $this->indexaArquivo($fpath, $fname, true,"");
 			
-			
-			
-			/*
-			// create a client instance
-            $client = new Solarium\Client($this->config);
 
-            // get an update query instance
-            $update = $client->createUpdate();
-
-            // add the delete id and a commit command to the update query
-            $update->addDeleteById('/'.$id);
-            $update->addCommit();
-
-            // this executes the query and returns the result
-            $result = $client->update($update);
-
-            $arr = explode('/', $id);
-
-            $fname = end($arr);
-
-            $fpath = 'download/' . $fname;
-
-            // create a client instance
-            $client = new Solarium\Client($this->config);
-
-            // get an extract query instance and add settings
-            $query = $client->createExtract();
-            $query->addFieldMapping('content', 'plain_text_txt_pt');
-            $query->setUprefix('attr_');
-            $query->setFile($fpath);
-            $query->setCommit(true);
-            $query->setOmitHeader(false);
-
-            // add document
-            $doc = $query->createDocument();
-            $doc->id = '/'.$id;
-            $doc->file_path_s = $fpath;
-        	if (!empty($_POST["subject"])) {
-            	$doc->subject_txt_pt = $_POST["subject"];
-            }
-            if (!empty($_POST["receiver"])) {
-            	$doc->receiver_txt_pt = $_POST["receiver"];
-            }
-            if (!empty($_POST["sector"])) {
-            	$doc->sector_txt_pt = $_POST["sector"];
-            }
-            if (!empty($_POST["identification"])) {
-            	$doc->identification_txt_pt = $_POST["identification"];
-            }
-            if (!empty($_POST["signer"])) {
-            	$doc->signer_txt_pt = $_POST["signer"];
-            }
-            if (!empty($_POST["author"])) {
-            	$doc->author_txt_pt = $_POST["author"];
-            }
-            if (!empty($_POST["fileDate"])){
-            	$doc->date_s = $_POST["fileDate"];
-            	$arr = explode('-', $_POST["fileDate"]);
-            	$doc->dateYear_s  = $arr[0];
-            	$doc->dateMonth_s = $arr[1];
-            	$doc->dateDay_s   = $arr[2];
-            }
-            if (!empty($_POST["title"])){
-            	$doc->title_txt_pt = $_POST["title"];
-            }
-            if (!empty($_POST["category"])){
-            	$doc->category_txt_pt = $_POST["category"];
-            }
-            if (!empty($_POST["secret"])) {
-            	$doc->secret_txt_pt = $_POST["secret"];
-            }
-            if (!empty($_POST["attachment"])) {
-            	$doc->attachment_txt_pt = $_POST["attachment"];
-            }
-            $doc->link_s = URL . 'downloads/' . $fname;
-            $query->setDocument($doc);
-
-            // this executes the query and returns the result
-            $result = $client->extract($query);
-
-            // get an update query instance
-            $update = $client->createUpdate();
-
-            // optimize the index
-            $update->addOptimize(true, false, 1);
-
-            // this executes the query and returns the result
-            $result = $client->update($update);
-			*/
         }
 
         // where to go after file has been edited
@@ -534,18 +445,53 @@ class Solr extends Controller
                 $q .= $prefix . "author_txt_pt:\"" . $_POST["author"] . "\"";
                 $prefix = " AND ";
             } 
-            if(!empty($_POST["title"])) {
-                $q .= $prefix . "title_txt_pt:\"" . $_POST["title"] . "\"";
+            if(!empty($_POST["user"])) {
+            	$q .= $prefix . "user_s:\"" . $_POST["user"] . "\"";
+            	$prefix = " AND ";
+            }
+            if(!empty($_POST["uploadDate"])) {
+            	$q .= $prefix . "indexingDate_s:\"" . $_POST["uploadDate"] . "\"";
+            	$prefix = " AND ";
+            }
+            if(!empty($_POST["signer"])) {
+            	$q .= $prefix . "signer_txt_pt:\"" . $_POST["signer"] . "\"";
+            	$prefix = " AND ";
+            }
+            if(!empty($_POST["receiver"])) {
+                $q .= $prefix . "receiver_txt_pt:\"" . $_POST["receiver"] . "\"";
                 $prefix = " AND ";
+            }
+            if(!empty($_POST["fileDate"])) {
+            	$q .= $prefix . "date_s:\"" . $_POST["fileDate"] . "\"";
+            	$prefix = " AND ";
             }
             if(!empty($_POST["category"])) {
                 $q .= $prefix . "category_txt_pt:\"" . $_POST["category"] . "\"";
                 $prefix = " AND ";
             }
-            if(!empty($_POST["keywords"])) {
-                $q .= $prefix . "keywords_txt_pt:" . preg_replace("/[\s]+/","+",$_POST["keywords"]);
+            if(!empty($_POST["identification"])) {
+            	$q .= $prefix . "identification_txt_pt:\"" . $_POST["identification"] . "\"";
+            	$prefix = " AND ";
             }
-
+            if(!empty($_POST["identification"])) {
+            	$q .= $prefix . "identification_txt_pt:\"" . $_POST["identification"] . "\"";
+            	$prefix = " AND ";
+            }
+            if(!empty($_POST["subject"])) {
+                $q .= $prefix . "subject_txt_pt:" . preg_replace("/[\s]+/","+",$_POST["subject"]);
+            }
+            if(!empty($_POST["sector"])) {
+            	$q .= $prefix . "sector_txt_pt:\"" . $_POST["sector"] . "\"";
+            	$prefix = " AND ";
+            }
+            if(!empty($_POST["secret"])) {
+            	$q .= $prefix . "secret_txt_pt:\"" . $_POST["secret"] . "\"";
+            	$prefix = " AND ";
+            }
+            if(!empty($_POST["attachment"])) {
+            	$q .= $prefix . "attachment_txt_pt:\"" . $_POST["attachment"] . "\"";
+            	$prefix = " AND ";
+            }
             $query->setQuery($q);
 
             // set start and rows param (comparable to SQL limit) using fluent interface

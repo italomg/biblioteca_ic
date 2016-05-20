@@ -76,7 +76,7 @@
                 $data = $arr[2].'/'.$arr[1].'/'.$arr[0];
               }
               else {
-                $data = "Não informado";
+                $data = "";
               }
 
               $arr = explode('/', $document["id"]);
@@ -87,16 +87,16 @@
                   <div class="bs-callout bs-callout-default">
                     <div class="left-list">
                       <i class="fa fa-file-<?php echo $icone; ?>-o fa-7x"></i>
-                      <br><a href="<?php echo URL.'download/'.$file; ?>" target="_blank" class="feature_btn"><i class="fa fa-cloud-download fa-lg" style="color: white;"></i></a>
+                      <br><a href="<?php echo (isset($document["image_s"]) ? URL.$document["image_s"] : URL."download/".$file)  ?>" target="_blank" class="feature_btn"><i class="fa fa-cloud-download fa-lg" style="color: white;"></i></a>
                       <a href="<?php echo URL.'solr/editar/'.$document["id"]; ?>" class="feature_btn"><i class="fa fa-pencil fa-lg" style="color: white;"></i></a>
                     </div>
                     <div>
-                        <h4><strong><?php echo (isset($document["title_txt_pt"])) ? $document["title_txt_pt"] : "Não informado"; ?></strong></h4>
-                        <p><strong>Autor:</strong> <?php echo (isset($document["author_txt_pt"])) ? $document["author_txt_pt"] : "Não informado"; ?></p>
-                        <p><strong>Data:</strong> <?php echo $data; ?></p>
-                        <p><strong>Categoria:</strong> <?php echo (isset($document["category_txt_pt"])) ? $document["category_txt_pt"] : "Não informado"; ?></p>
-                        <p><strong>Palavras-chave:</strong> <?php echo (isset($document["keywords_txt_pt"])) ? $document["keywords_txt_pt"] : "Não informado"; ?></p>
-                        <p><strong>Nome do arquivo:</strong> <?php echo $file; ?></p>
+                       <h4><strong><?php echo $file; ?></strong></h4>
+                        <p><strong>Autor:</strong> <?php echo $document["author_txt_pt"]; ?></p>
+                        <p><strong>Produção:</strong> <?php echo $data; ?></p>
+                        <p><strong>Espécie:</strong> <?php echo $document["category_txt_pt"]; ?></p>
+                        <p><strong>Identificação:</strong> <?php echo $document["identification_txt_pt"]; ?></p>
+                        <p><strong>Setor:</strong> <?php echo $document["sector_txt_pt"]; ?></p>
                     </div>
                     <div class="clear-div"></div>
                   </div>
