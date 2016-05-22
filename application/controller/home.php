@@ -26,8 +26,7 @@ class Home extends Controller
         // set start and rows param (comparable to SQL limit) using fluent interface
         $query->setRows(4);
 
-        // sort the results by price ascending
-        $query->addSort('indexation_date_dt', $query::SORT_DESC);
+        $query->addSort('indexingdate_s', $query::SORT_DESC);
 
         // this executes the query and returns the result
         $resultset = $client->select($query);

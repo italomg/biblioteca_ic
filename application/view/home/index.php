@@ -102,8 +102,41 @@
 ?>
                     <div class="col-md-3 feature_grid<?php echo ($i == 4) ? '2' : '1'; ?>">
                         <i class="fa fa-file-<?php echo $icone; ?>-o fa-5x"></i>
-                        <h3 class="m_1"><a href="#"><?php echo $document["title_txt_pt"]; ?></a></h3>
-                        <p class="m_2"><?php echo (isset($document["category_txt_pt"])) ? $document["category_txt_pt"].'<br>' : ''; ?>Inserido em 15 de agosto de 2015</p>
+                        <h4 class="m_1"><a href="solr/detalhes/<?php echo $document['id']; ?>"><?php echo $document["id"]; ?></a></h3>
+                        <p class="m_2"><?php echo (isset($document["category_txt_pt"])) ? $document["category_txt_pt"].'<br>' : ''; ?>
+                           
+                        Inserido em <?php echo $document["indexingday_s"] ?> de <?php 
+                        
+                        $mes_num = $document["indexingmonth_s"];
+                        
+                        if($mes_num == 01){
+                        $mes_nome = "Janeiro";
+                        }elseif($mes_num == 02){
+                        $mes_nome = "Fevereiro";
+                        }elseif($mes_num == 03){
+                        $mes_nome = "Março";
+                        }elseif($mes_num == 04){
+                        $mes_nome = "Abril";
+                        }elseif($mes_num == 05){
+                        $mes_nome = "Maio";
+                        }elseif($mes_num == 06){
+                        $mes_nome = "Junho";
+                        }elseif($mes_num == 07){
+                        $mes_nome = "Julho";
+                        }elseif($mes_num == 08){
+                        $mes_nome = "Agosto";
+                        }elseif($mes_num == 09){
+                        $mes_nome = "Setembro";
+                        }elseif($mes_num == 10){
+                        $mes_nome = "Outubro";
+                        }elseif($mes_num == 11){
+                        $mes_nome = "Novembro";
+                        }else{
+                        $mes_nome = "Dezembro";
+                        }
+                        
+                       echo $mes_nome; ?> de <?php echo $document["indexingyear_s"] ?></p>
+    
                         <a href="<?php echo URL; ?>solr/detalhes/<?php echo $document['id']; ?>" class="feature_btn">Detalhes</a>
                     </div>
 
@@ -130,3 +163,4 @@
            <div class="content_white_narrow">
           </div>
         </div>
+        
