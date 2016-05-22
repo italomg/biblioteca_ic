@@ -13,8 +13,8 @@
                       <li><a href="<?php echo URL; ?>solr/pesquisar">Pesquisar</a></li>
                       <li><a href="<?php echo URL; ?>solr/inserir">Inserir</a></li>
                       <li><a href="<?php echo URL; ?>solr/inserir_batch">Inserir Batch</a></li>
-                      <li class="current"><a href="<?php echo URL; ?>solr/listar">Listar Todos</a></li>
-                      <li><a href="<?php echo URL; ?>solr/listar_categoria">Listar Categoria</a></li>
+                      <li><a href="<?php echo URL; ?>solr/listar">Listar Todos</a></li>
+                      <li class="current"><a href="<?php echo URL; ?>solr/listar_categoria">Listar Categoria</a></li>
                       <li><a href="<?php echo URL; ?>solr/contato">Contato</a></li>
                       <div class="clear"></div>
                     </ul>
@@ -30,16 +30,36 @@
             <div class="footer_top">
                 <div class="container">
                     <div class="footer_head_narrow">
-                        <h2>Índice de documentos</h2>
-                        <p>Listagem de todos os documentos cadastrados</p>
+                        <h2>Escolha uma categoria</h2>
                     </div>
+                    
+                     <form class="busca-avancada" action="<?php echo URL; ?>solr/listar_categoria" method="POST" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label>Categoria</label>
+                                <select class="form-control" name="category">
+                                            <option <?php if(isset($_SESSION['category']) && $_SESSION['category'] == "Ata de Congregação") echo 'selected'; ?> value="Ata de Congregação">Ata de Congregação</option>
+                                            <option <?php if(isset($_SESSION['category']) && $_SESSION['category'] == "Pauta de Congregação") echo 'selected'; ?> value="Pauta de Congregação">Pauta de Congregação</option>
+                                            <option <?php if(isset($_SESSION['category']) && $_SESSION['category'] == "Deliberação de Congregação") echo 'selected'; ?> value="Deliberação de Congregação">Deliberação de Congregação</option>
+                                            <option <?php if(isset($_SESSION['category']) && $_SESSION['category'] == "Ofício") echo 'selected'; ?> value="Ofício">Ofício</option>
+                                            <option <?php if(isset($_SESSION['category']) && $_SESSION['category'] == "Portaria") echo 'selected'; ?> value="Portaria">Portaria</option>
+                                            <option <?php if(isset($_SESSION['category']) && $_SESSION['category'] == "Item de Pauta") echo 'selected'; ?> value="Item de Pauta">Item de Pauta</option>
+                                            <option <?php if(isset($_SESSION['category']) && $_SESSION['category'] == "Ata de CI") echo 'selected'; ?> value="Ata de CI">Ata de CI</option>
+                                            <option <?php if(isset($_SESSION['category']) && $_SESSION['category'] == "Pauta de CI") echo 'selected'; ?> value="Pauta de CI">Pauta de CI</option>
+                                            <option <?php if(isset($_SESSION['category']) && $_SESSION['category'] == "Deliberação de CI") echo 'selected'; ?> value="Deliberação de CI">Deliberação de CI</option>
+                                </select>
+                                <br>
+                                <div class="form-group">
+                                    <input type="submit" name="submit_add_file" value="Enviar" />
+                                </div>
+                        </div>
+                    </form>              
                 </div>
             </div>
     </div>
 
     <div class="content_white_narrow"></div>
-
-    <div class="container">
+    
+        <div class="container">
 
 <?php
 
@@ -47,7 +67,6 @@
     echo "<br><br>Não há documentos para serem exibidos!<br><br><br>";
   }
   else {
-
     $n = $number_of_results/2;
     $i = 0;
 
@@ -119,7 +138,7 @@
     <nav>
       <ul class="pagination">
         <li <?php if($page == 1) echo "class='disabled'"; ?>>
-          <?php if($page != 1) echo "<a href='".URL."solr/listar/".($page-1)."'>"; ?>
+          <?php if($page != 1) echo "<a href='".URL."solr/listar_categoria/".($page-1)."'>"; ?>
             <span aria-hidden="true">&laquo;</span>
           <?php if($page != 1) echo "</a>"; ?>
         </li>
@@ -128,13 +147,13 @@
 
   for ($i=1; $i <= $number_of_pages; $i++) { 
 ?>
-        <li <?php if($i == $page) echo "class='active'"; ?>><a href="<?php echo URL; ?>solr/listar/<?php echo $i; ?>"><?php echo $i; ?></a></li>
+        <li <?php if($i == $page) echo "class='active'"; ?>><a href="<?php echo URL; ?>solr/listar_categoria/<?php echo $i; ?>"><?php echo $i; ?></a></li>
 <?php
   }
 ?>
         
         <li <?php if($page == $number_of_pages) echo "class='disabled'"; ?>>
-          <?php if($page != $number_of_pages) echo "<a href='".URL."solr/listar/".($page+1)."'>"; ?>
+          <?php if($page != $number_of_pages) echo "<a href='".URL."solr/listar_categoria/".($page+1)."'>"; ?>
             <span aria-hidden="true">&raquo;</span>
           <?php if($page != $number_of_pages) echo "</a>"; ?>
         </li>
@@ -146,6 +165,7 @@
   }
 
 ?>
+
   
 <div class="content_white_narrow"></div>
 

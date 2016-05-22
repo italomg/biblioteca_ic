@@ -6,7 +6,7 @@
 					</a>
 				</div>
 				<div class="col-md-8">
-					<p>Copyright &copy; 2015 UNICAMP</a></p>
+					<p>Copyright &copy; 2016 UNICAMP</a></p>
 					<br>
 					<small>
 						<p><strong>Instituto de Computação :: Universidade Estadual de Campinas</strong></p>

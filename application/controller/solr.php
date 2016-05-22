@@ -1,4 +1,9 @@
 <?php
+session_start();
+?>
+
+
+<?php
 
 /**
  * Class Songs
@@ -37,6 +42,41 @@ class Solr extends Controller
         // load views
         require APP . 'view/_templates/header.php';
         require APP . 'view/solr/listar.php';
+        require APP . 'view/_templates/footer.php';
+    }
+	
+
+	
+	/**
+     * PAGE: listar_categoria
+     * This method handles what happens when you move to http://yourproject/solr/listar_categoria
+     */
+    public function listar_categoria($page = 1)
+    {
+		if (isset($_POST["category"])) {
+			$_SESSION['category'] = $_POST["category"];
+        }
+		
+        // create a client instance
+        $client = new Solarium\Client($this->config);
+
+		// get a select query instance
+        $query = $client->createSelect();
+		
+        $query->setQuery('category_txt_pt:"/'.$_SESSION['category'].'"');
+	
+        // set start and rows param (comparable to SQL limit) using fluent interface
+        $query->setStart(($page-1)*10)->setRows(10);
+
+        // this executes the query and returns the result
+        $resultset = $client->execute($query);
+
+        // display the total number of documents found by solr
+        $number_of_results = $resultset->getNumFound();
+
+        // load views
+        require APP . 'view/_templates/header.php';
+        require APP . 'view/solr/listar_categoria.php';
         require APP . 'view/_templates/footer.php';
     }
 
@@ -230,6 +270,21 @@ class Solr extends Controller
 
         // where to go after file has been added
         header('location: ' . URL . 'solr/inserir');
+	
+        // Cache dump
+        header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+        header("Cache-Control: post-check=0, pre-check=0", false);
+        header("Pragma: no-cache");
+    }
+	
+	public function enviarCategoria()
+    {
+        // if we have POST data
+        if (isset($_POST["category"])) {
+			$this->categoria = $_POST["category"];
+        }
+		
+        header('location: ' . URL . 'solr/listar_categoria');
 	
         // Cache dump
         header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
