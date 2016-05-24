@@ -53,32 +53,60 @@ class Solr extends Controller
      */
     public function listar_categoria($page = 1)
     {
-		if (isset($_POST["category"])) {
+		if (isset($_POST["submit"])) {
 			$_SESSION['category'] = $_POST["category"];
+			$_SESSION['year'] = $_POST["year"];
         }
 		
-        // create a client instance
-        $client = new Solarium\Client($this->config);
+		// soh entra se setou ou a categoria ou o ano e sao diferentes de vazio
+		if((isset($_SESSION['category']) || isset($_SESSION['year'])) && (!empty($_SESSION['year']) || !empty($_SESSION['category']))) {
+			// create a client instance
+			$client = new Solarium\Client($this->config);
 
-		// get a select query instance
-        $query = $client->createSelect();
+			// get a select query instance
+			$query = $client->createSelect();
+
+			if(empty($_SESSION['year'])) {
+				$query->setQuery('category_txt_pt:"/'.$_SESSION['category'].'"');
+			}
+			elseif(empty($_SESSION['category'])) {
+				$query->setQuery('dateyear_s:'.$_SESSION['year']);
+
+			}
+			else {
+				$query->setQuery('(dateyear_s:'.$_SESSION['year'].') AND (category_txt_pt:"'.$_SESSION['category'].'")');
+				$this->console('(dateyear_s:'.$_SESSION['year'].') AND (category_txt_pt:"'.$_SESSION['category'].'")');
+			}
 		
-        $query->setQuery('category_txt_pt:"/'.$_SESSION['category'].'"');
-	
-        // set start and rows param (comparable to SQL limit) using fluent interface
-        $query->setStart(($page-1)*10)->setRows(10);
+			// set start and rows param (comparable to SQL limit) using fluent interface
+			$query->setStart(($page-1)*10)->setRows(10);
 
-        // this executes the query and returns the result
-        $resultset = $client->execute($query);
+			// this executes the query and returns the result
+			$resultset = $client->execute($query);
 
-        // display the total number of documents found by solr
-        $number_of_results = $resultset->getNumFound();
+			// display the total number of documents found by solr
+			$number_of_results = $resultset->getNumFound();
+		}
 
         // load views
         require APP . 'view/_templates/header.php';
         require APP . 'view/solr/listar_categoria.php';
         require APP . 'view/_templates/footer.php';
     }
+	
+	
+	
+	// para debugar
+	private function console( $data ) {
+		if ( is_array( $data ) )
+			$output = "<script>console.log( 'Debug Objects: " . implode( ',', $data) . "' );</script>";
+		else
+			$output = "<script>console.log( 'Debug Objects: " . $data . "' );</script>";
+
+		echo $output;
+	}
+
+
 
     /**
      * PAGE: listarTudo
@@ -425,10 +453,7 @@ class Solr extends Controller
 
             $fpath = 'download/' . $fname;
 			
-			
             $this->indexaArquivo($fpath, $fname, true,"");
-			
-
         }
 
         // where to go after file has been edited

@@ -12,9 +12,9 @@
                       <li><a href="<?php echo URL; ?>">Home</a></li>
                       <li><a href="<?php echo URL; ?>solr/pesquisar">Pesquisar</a></li>
                       <li><a href="<?php echo URL; ?>solr/inserir">Inserir</a></li>
-                      <li><a href="<?php echo URL; ?>solr/inserir_batch">Inserir Batch</a></li>
+                      <li><a href="<?php echo URL; ?>solr/inserir_batch">Inserir Lote</a></li>
                       <li><a href="<?php echo URL; ?>solr/listar">Listar Todos</a></li>
-                      <li class="current"><a href="<?php echo URL; ?>solr/listar_categoria">Listar Categoria</a></li>
+                      <li class="current"><a href="<?php echo URL; ?>solr/listar_categoria">Listar Categoria/Ano</a></li>
                       <li><a href="<?php echo URL; ?>solr/contato">Contato</a></li>
                       <div class="clear"></div>
                     </ul>
@@ -37,6 +37,7 @@
                         <div class="form-group">
                             <label>Categoria</label>
                                 <select class="form-control" name="category">
+                                     <option <?php if(!isset($_SESSION['category'])) echo 'selected'; ?> value=""></option>
                                             <option <?php if(isset($_SESSION['category']) && $_SESSION['category'] == "Ata de Congregação") echo 'selected'; ?> value="Ata de Congregação">Ata de Congregação</option>
                                             <option <?php if(isset($_SESSION['category']) && $_SESSION['category'] == "Pauta de Congregação") echo 'selected'; ?> value="Pauta de Congregação">Pauta de Congregação</option>
                                             <option <?php if(isset($_SESSION['category']) && $_SESSION['category'] == "Deliberação de Congregação") echo 'selected'; ?> value="Deliberação de Congregação">Deliberação de Congregação</option>
@@ -47,11 +48,17 @@
                                             <option <?php if(isset($_SESSION['category']) && $_SESSION['category'] == "Pauta de CI") echo 'selected'; ?> value="Pauta de CI">Pauta de CI</option>
                                             <option <?php if(isset($_SESSION['category']) && $_SESSION['category'] == "Deliberação de CI") echo 'selected'; ?> value="Deliberação de CI">Deliberação de CI</option>
                                 </select>
-                                <br>
-                                <div class="form-group">
-                                    <input type="submit" name="submit_add_file" value="Enviar" />
                                 </div>
-                        </div>
+                                
+                                <div class="form-group">
+                                    <label>Ano</label>
+                                    <input class="form-control" type="text" name="year" value="<?php if(isset($_SESSION['year'])) echo $_SESSION['year']; ?>"/>
+                                </div>
+                            
+                                <div class="form-group">
+                                    <input type="submit" name="submit" value="Enviar" />
+                                </div>
+                        
                     </form>              
                 </div>
             </div>
@@ -63,6 +70,7 @@
 
 <?php
 
+    if (isset($number_of_results)) {
   if($number_of_results == 0) {
     echo "<br><br>Não há documentos para serem exibidos!<br><br><br>";
   }
@@ -163,6 +171,7 @@
 <?php
 
   }
+}
 
 ?>
 
