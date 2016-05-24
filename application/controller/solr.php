@@ -335,16 +335,46 @@ class Solr extends Controller
 			
 			$fname = basename ( $_FILES ['zipToUpload'] ['name'] );
 			
-			$flist = $this->batchUpload ( 'zipToUpload', $creation, $upload_dir );
+			// recebe vetor ordenado com o nome dos arquivos a serem indexados
+			$flist = $this->batchUpload ( 'zipToUpload', $upload_dir );
             
             $dest_dir = 'download/';
 			
-			if ($flist == null)
-				return false;
-			
-			foreach ( $flist as $f ) {
-                rename($upload_dir.$f, $dest_dir.$f);
-				$this->indexaArquivo($dest_dir.$f, $f, false, "");
+			if ($flist != null && count($flist) != 0) {
+				for($i = 0 ; $i < count($flist); $i++) {
+					// soh tem o imagem, indexa como se fosse o texto
+					if($this->endsWith($flist[$i], "_img.pdf")) {
+						rename($upload_dir.$flist[$i], $dest_dir.$flist[$i]);
+						$this->indexaArquivo($dest_dir.$flist[$i], $flist[$i], false, "");
+						continue;
+					}
+					
+					$imagem = "";
+					
+					// se nao for o ultimo, ve se o proximo tem
+					// o mesmo nome e termina com _img.pdf
+					// se positivo, indexa os dois, se nao, indexa soh o texto
+					if($i < count($flist)-1) {
+						if($this->endsWith($flist[$i+1], "_img.pdf")) {				
+							$a = str_replace(".pdf", "", $flist[$i]);
+							$a = str_replace(".doc", "", $a);
+							$b = str_replace("_img.pdf", "", $flist[$i+1]);
+
+							// sao iguais
+							if(strcmp($a, $b) == 0) {
+								$imagem = $dest_dir.$flist[$i+1];
+								rename($upload_dir.$flist[$i+1], $imagem);
+							}
+						}
+					}
+					
+					rename($upload_dir.$flist[$i], $dest_dir.$flist[$i]);	
+					$this->indexaArquivo($dest_dir.$flist[$i], $flist[$i], false, $imagem);
+					
+					// se ja indexou a imagem, pula um indice
+					if(!empty($imagem))
+						$i++;
+				}
 			}
 		}
 		
@@ -620,11 +650,20 @@ class Solr extends Controller
 	 * ACTION: batchUpload
 	 * IMPORTANT: This is not a normal page, it's an ACTION.
 	 */
-	public function batchUpload($input_name, $creation, $upload_dir) {
+	public function batchUpload($input_name, $upload_dir) {
 		// if we have an id that should be edited
 		if ($_FILES [$input_name] ['error'] == 0) {
 			if (! file_exists ( $upload_dir )) {
 				mkdir ( $upload_dir, 0755, true );
+			}
+			
+			// esvazia o diretorio temp
+			else {
+				$files1 = scandir ( $upload_dir );
+				foreach($files1 as $f){ 
+				  if(is_file($f))
+					unlink($f);
+				}
 			}
 			
 			$target_file = $upload_dir . '/' . basename ( $_FILES [$input_name] ['name'] );
@@ -634,9 +673,11 @@ class Solr extends Controller
 			}
 			
 			if (! move_uploaded_file ( $_FILES [$input_name] ["tmp_name"], $target_file )) {
-				return false;
+				echo "Erro ao mover arquivo".$_FILES [$input_name] ["tmp_name"]." para ".$target_file;
+				return null;
 			}
 			
+			// extrai .zip
 			if ($this->endsWith ( $target_file, ".zip" )) {
 				$zip = new ZipArchive ();
 				if ($zip->open ( $target_file ) === TRUE) {
@@ -699,17 +740,27 @@ class Solr extends Controller
 			if (($key = array_search ( '..', $files1 )) !== false) {
 				unset ( $files1 [$key] );
 			}
-            
+			
             // remove os arquivos que nao terminam com .pdf ou .doc
             foreach($files1 as $f) {
                 if(!($this->endsWith($f, ".pdf") || $this->endsWith($f, ".doc"))) {
-                    echo $f."<br>";
                     unset ( $files1 [$f]);
                     unlink ( $upload_dir."/".$f);
                 }
             }
-            
-			return $files1;
+			
+			asort($files1);
+			
+			$flist = [];
+			
+			// associa os valores do array com o indice
+			$i = 0 ;
+			foreach($files1 as $f) {
+				$flist[$i] = $f;
+				$i++;
+			}
+			
+			return $flist;
 		}
 	}
 	function endsWith($haystack, $needle) {

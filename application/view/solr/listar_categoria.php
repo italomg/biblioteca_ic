@@ -52,7 +52,7 @@
                                 
                                 <div class="form-group">
                                     <label>Ano</label>
-                                    <input class="form-control" type="text" name="year" value="<?php if(isset($_SESSION['year'])) echo $_SESSION['year']; ?>"/>
+                                    <input class="form-control" type="number" min="1800" max="3000" name="year" value="<?php if(isset($_SESSION['year'])) echo $_SESSION['year']; ?>"/>
                                 </div>
                             
                                 <div class="form-group">

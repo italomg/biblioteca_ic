@@ -1723,9 +1723,22 @@ textarea.form-control {
 input[type="search"] {
   -webkit-appearance: none;
 }
+
+
 input[type="date"] {
   line-height: 34px;
 }
+
+input[type="number"] {
+  line-height: 34px;
+  width: 80%;
+  background-color: #597275;
+  border: 0px;
+  color: #fff;
+  
+}
+
+
 .form-group {
   margin-bottom: 15px;
 }
