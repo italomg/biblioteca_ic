@@ -92,7 +92,7 @@
                       <a href="<?php echo URL.'solr/editar/'.$document["id"]; ?>" class="feature_btn"><i class="fa fa-pencil fa-lg" style="color: white;"></i></a>
                     </div>
                     <div>
-                       <h4><strong><?php echo $file; ?></strong></h4>
+                       <h4><strong><a href="<?php echo URL."download/".$file ?>"><?php echo $file; ?></a></strong></h4>
                         <p><strong>Autor:</strong> <?php echo $document["author_txt_pt"]; ?></p>
                         <p><strong>Produção:</strong> <?php echo $data; ?></p>
                         <p><strong>Espécie:</strong> <?php echo $document["category_txt_pt"]; ?></p>

@@ -12,9 +12,8 @@
                       <li><a href="<?php echo URL; ?>">Home</a></li>
                       <li><a href="<?php echo URL; ?>solr/pesquisar">Pesquisar</a></li>
                       <li><a href="<?php echo URL; ?>solr/inserir">Inserir</a></li>
-                      <li><a href="<?php echo URL; ?>solr/inserir_batch">Inserir Lote</a></li>
+                      <li><a href="<?php echo URL; ?>solr/inserir_batch">Inserir Batch</a></li>
                       <li><a href="<?php echo URL; ?>solr/listar">Listar Todos</a></li>
-                      <li><a href="<?php echo URL; ?>solr/listar_categoria">Listar Categoria/Ano</a></li>
                       <li><a href="<?php echo URL; ?>solr/contato">Contato</a></li>
                       <div class="clear"></div>
                     </ul>
@@ -77,7 +76,7 @@
                 $data = $arr[2].'/'.$arr[1].'/'.$arr[0];
               }
               else {
-                $data = "";
+                $data = "Não informado";
               }
 
               $arr = explode('/', $document["id"]);
@@ -91,7 +90,7 @@
                       <a href="<?php echo URL.'solr/editar/'.$document["id"]; ?>" class="feature_btn"><i class="fa fa-pencil fa-lg" style="color: white;"></i></a>
                     </div>
                     <div>
-                        <h4><strong><?php echo $file; ?></strong></h4>
+                        <h4><strong><a href="<?php echo URL."download/".$file ?>"><?php echo $file; ?></a></strong></h4>
                         <p><strong>Autor:</strong> <?php echo $document["author_txt_pt"]; ?></p>
                         <p><strong>Produção:</strong> <?php echo $data; ?></p>
                         <p><strong>Espécie:</strong> <?php echo $document["category_txt_pt"]; ?></p>
