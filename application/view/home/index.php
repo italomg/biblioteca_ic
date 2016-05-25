@@ -105,9 +105,9 @@
                         <h4 class="m_1"><a href="solr/detalhes/<?php echo $document['id']; ?>"><?php echo $document["id"]; ?></a></h3>
                         <p class="m_2"><?php echo (isset($document["category_txt_pt"])) ? $document["category_txt_pt"].'<br>' : ''; ?>
                            
-                        Inserido em <?php echo $document["indexingDay_s"] ?> de <?php 
+                        Inserido em <?php echo $document["indexingday_s"] ?> de <?php 
                         
-                        $mes_num = $document["indexingMonth_s"];
+                        $mes_num = $document["indexingmonth_s"];
                         
                         if($mes_num == 01){
                         $mes_nome = "Janeiro";
@@ -135,7 +135,7 @@
                         $mes_nome = "Dezembro";
                         }
                         
-                       echo $mes_nome; ?> de <?php echo $document["indexingYear_s"] ?></p>
+                       echo $mes_nome; ?> de <?php echo $document["indexingyear_s"] ?></p>
     
                         <a href="<?php echo URL; ?>solr/detalhes/<?php echo $document['id']; ?>" class="feature_btn">Detalhes</a>
                     </div>
