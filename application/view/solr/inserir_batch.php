@@ -80,17 +80,15 @@
                                     </div>
                                     <div class="form-group">
                                         <label>Espécie</label>
-                                        <select class="form-control" name="category">
-                                            <option value="" selected></option>
-                                            <option value="Ata de Congregação">Ata de Congregação</option>
-                                            <option value="Pauta de Congregação">Pauta de Congregação</option>
-                                            <option value="Deliberação de Congregação">Deliberação de Congregação</option>
+                                       <select class="form-control" name="category">
+                                            <option value=""></option>
+                                            <option value="Ata">Ata</option>
+                                            <option value="Pauta">Pauta</option>
+                                            <option value="Deliberação">Deliberação</option>
                                             <option value="Ofício">Ofício</option>
                                             <option value="Portaria">Portaria</option>
                                             <option value="Item de Pauta">Item de Pauta</option>
-                                            <option value="Ata de CI">Ata de CI</option>
-                                            <option value="Pauta de CI">Pauta de CI</option>
-                                            <option value="Deliberação de CI">Deliberação de CI</option>
+                                            <option value="Outros">Outros</option>
                                         </select>
                                     </div>
                                     <div class="form-group">

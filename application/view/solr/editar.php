@@ -80,15 +80,13 @@
                                         <label>Espécie</label>
                                         <select class="form-control" name="category">
                                             <option value=""></option>
-                                            <option <?php if(isset($document["category_txt_pt"]) && $document["category_txt_pt"] == "Ata de Congregação") echo 'selected'; ?> value="Ata de Congregação">Ata de Congregação</option>
-                                            <option <?php if(isset($document["category_txt_pt"]) && $document["category_txt_pt"] == "Pauta de Congregação") echo 'selected'; ?> value="Pauta de Congregação">Pauta de Congregação</option>
-                                            <option <?php if(isset($document["category_txt_pt"]) && $document["category_txt_pt"] == "Deliberação de Congregação") echo 'selected'; ?> value="Deliberação de Congregação">Deliberação de Congregação</option>
+                                            <option <?php if(isset($document["category_txt_pt"]) && $document["category_txt_pt"] == "Ata") echo 'selected'; ?> value="Ata">Ata</option>
+                                            <option <?php if(isset($document["category_txt_pt"]) && $document["category_txt_pt"] == "Pauta") echo 'selected'; ?> value="Pauta">Pauta</option>
+                                            <option <?php if(isset($document["category_txt_pt"]) && $document["category_txt_pt"] == "Deliberação") echo 'selected'; ?> value="Deliberação">Deliberação</option>
                                             <option <?php if(isset($document["category_txt_pt"]) && $document["category_txt_pt"] == "Ofício") echo 'selected'; ?> value="Ofício">Ofício</option>
                                             <option <?php if(isset($document["category_txt_pt"]) && $document["category_txt_pt"] == "Portaria") echo 'selected'; ?> value="Portaria">Portaria</option>
                                             <option <?php if(isset($document["category_txt_pt"]) && $document["category_txt_pt"] == "Item de Pauta") echo 'selected'; ?> value="Item de Pauta">Item de Pauta</option>
-                                            <option <?php if(isset($document["category_txt_pt"]) && $document["category_txt_pt"] == "Ata de CI") echo 'selected'; ?> value="Ata de CI">Ata de CI</option>
-                                            <option <?php if(isset($document["category_txt_pt"]) && $document["category_txt_pt"] == "Pauta de CI") echo 'selected'; ?> value="Pauta de CI">Pauta de CI</option>
-                                            <option <?php if(isset($document["category_txt_pt"]) && $document["category_txt_pt"] == "Deliberação de CI") echo 'selected'; ?> value="Deliberação de CI">Deliberação de CI</option>
+                                            <option <?php if(isset($document["category_txt_pt"]) && $document["category_txt_pt"] == "Outros") echo 'selected'; ?> value="Outros">Outros</option>
                                         </select>
                                     </div>
                                     <div class="form-group">
