@@ -60,19 +60,19 @@ body a{
 .menu li a:hover ,.menu li.active a{
 	color:#fff;
    background:#e4551d !important;
-} 
+}
 .toggleMenu {
 	display:  none;
    	padding:4px 5px 0px 5px;
-    border-radius:2em; 
+    border-radius:2em;
     -webkit-border-radius:2em;
     -moz-border-radius:2em;
-    -o-border-radius:2em; 
+    -o-border-radius:2em;
 }
 .nav:before,
 .nav:after {
-    content: " "; 
-    display: table; 
+    content: " ";
+    display: table;
 }
 .nav:after {
     clear: both;
@@ -110,7 +110,7 @@ body a{
     	top:15px;
     }
     .nav li ul{
-    	width:100%;   	
+    	width:100%;
     }
     .menu ul{
     	margin:0;
@@ -188,7 +188,7 @@ a.banner-btn span:hover {
 	padding: 1em 0;
 	height: 180px;
 	background: #e4551d;
-}  
+}
 .content_orange h2{
 	padding: 2em 0;
 	font-size:2em;
@@ -204,11 +204,11 @@ a.banner-btn span:hover {
 .content_white_narrow{
 	text-align:center;
 	padding: 2em 0;
-} 
+}
 .content_white{
 	text-align:center;
 	padding: 3em 0;
-} 
+}
 .content_white h2{
 	font-size:2em;
 	font-weight:bold;
@@ -454,6 +454,10 @@ ul.test_box li.test_desc p {
 	border-bottom: 1px solid #597275;
 	padding-bottom: 3em;
 }
+.footer_head_notaligned{	
+	border-bottom: 1px solid #597275;
+	padding-bottom: 3em;
+}
 .footer_head_narrow{
 	text-align: center;
 }
@@ -496,7 +500,7 @@ ul.message li.msg-desc h4 a{
 	font-weight: bold;
 	color:#fff;
 	text-decoration: none;
-}	
+}
 ul.message li.msg-desc h4 a:hover{
 	color:#e4551d;
 }
@@ -944,7 +948,7 @@ h2.post_title a{
 h2.post_title a:hover{
 	text-decoration:none;
 	color: #e4551d;
-} 
+}
 .blog_grid p, .blog_grid1 p{
 	font-size: 0.85em;
 	line-height: 1.5em;
@@ -1227,7 +1231,7 @@ ul.comment-list .desc {
 	background:#637f83;
 	font-size: 1.2em;
 	border: none;
-	outline: none;	
+	outline: none;
 	cursor: pointer;
 	font-weight:bold;
 	-webkit-transition: all 0.5s ease-in-out;
@@ -1762,5 +1766,3 @@ input.text {
 .bs-callout-info h4 {
     color: #5bc0de;
 }
-
-

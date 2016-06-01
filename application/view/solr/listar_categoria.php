@@ -16,10 +16,11 @@
                       <li><a href="<?php echo URL; ?>solr/listar">Listar Todos</a></li>
                       <li class="current"><a href="<?php echo URL; ?>solr/listar_categoria">Listar Categoria/Ano</a></li>
                       <li><a href="<?php echo URL; ?>solr/contato">Contato</a></li>
+                      <li><a href="<?php echo URL; ?>solr/docgenerator">Criar Pauta</a></li>
                       <div class="clear"></div>
                     </ul>
                     <script type="text/javascript" src="web/js/responsive-nav.js"></script>
-                </div>                          
+                </div>
                 <div class="clearfix"> </div>
                 <!----//End-top-nav---->
              </div>
@@ -32,7 +33,7 @@
                     <div class="footer_head_narrow">
                         <h2>Escolha uma categoria</h2>
                     </div>
-                    
+
                      <form class="busca-avancada" action="<?php echo URL; ?>solr/listar_categoria" method="POST" enctype="multipart/form-data">
                         <div class="form-group">
                             <label>Categoria</label>
@@ -49,23 +50,23 @@
                                             <option <?php if(isset($_SESSION['category']) && $_SESSION['category'] == "Deliberação de CI") echo 'selected'; ?> value="Deliberação de CI">Deliberação de CI</option>
                                 </select>
                                 </div>
-                                
+
                                 <div class="form-group">
                                     <label>Ano</label>
                                     <input class="form-control" type="number" min="1800" max="3000" name="year" value="<?php if(isset($_SESSION['year'])) echo $_SESSION['year']; ?>"/>
                                 </div>
-                            
+
                                 <div class="form-group">
                                     <input type="submit" name="submit" value="Enviar" />
                                 </div>
-                        
-                    </form>              
+
+                    </form>
                 </div>
             </div>
     </div>
 
     <div class="content_white_narrow"></div>
-    
+
         <div class="container">
 
 <?php
@@ -130,7 +131,7 @@
                   </div>
 
   <?php
-        
+
         echo "</div>";
         if($i%2 == 1) echo "</div>";
 
@@ -153,13 +154,13 @@
 <?php
   $number_of_pages = ceil($number_of_results/10);
 
-  for ($i=1; $i <= $number_of_pages; $i++) { 
+  for ($i=1; $i <= $number_of_pages; $i++) {
 ?>
         <li <?php if($i == $page) echo "class='active'"; ?>><a href="<?php echo URL; ?>solr/listar_categoria/<?php echo $i; ?>"><?php echo $i; ?></a></li>
 <?php
   }
 ?>
-        
+
         <li <?php if($page == $number_of_pages) echo "class='disabled'"; ?>>
           <?php if($page != $number_of_pages) echo "<a href='".URL."solr/listar_categoria/".($page+1)."'>"; ?>
             <span aria-hidden="true">&raquo;</span>
@@ -175,7 +176,7 @@
 
 ?>
 
-  
+
 <div class="content_white_narrow"></div>
 
 </div>

@@ -14,11 +14,12 @@
                       <li><a href="<?php echo URL; ?>solr/inserir_batch">Inserir Lote</a></li>
                       <li><a href="<?php echo URL; ?>solr/listar">Listar Todos</a></li>
                       <li><a href="<?php echo URL; ?>solr/listar_categoria">Listar Categoria/Ano</a></li>
-                      <li class="current"><a href="<?php echo URL; ?>solr/contato">Contato</a></li>                          
+                      <li class="current"><a href="<?php echo URL; ?>solr/contato">Contato</a></li>
+                      <li><a href="<?php echo URL; ?>solr/docgenerator">Criar Pauta</a></li>                      
                       <div class="clear"></div>
                     </ul>
                     <script type="text/javascript" src="web/js/responsive-nav.js"></script>
-                </div>                          
+                </div>
                 <div class="clearfix"> </div>
                 <!----//End-top-nav---->
              </div>

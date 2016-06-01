@@ -15,10 +15,11 @@
                       <li><a href="<?php echo URL; ?>solr/listar">Listar Todos</a></li>
                       <li><a href="<?php echo URL; ?>solr/listar_categoria">Listar Categoria/Ano</a></li>
                       <li><a href="<?php echo URL; ?>solr/contato">Contato</a></li>
+                      <li><a href="<?php echo URL; ?>solr/docgenerator">Criar Pauta</a></li>
                       <div class="clear"></div>
                     </ul>
                     <script type="text/javascript" src="web/js/responsive-nav.js"></script>
-                </div>                          
+                </div>
                 <div class="clearfix"> </div>
                 <!----//End-top-nav---->
              </div>
@@ -61,7 +62,7 @@
                </div>
              </div>
             </div>
-             
+
 
         <!----//start-content---->
         <div class="main">
@@ -104,11 +105,11 @@
                         <i class="fa fa-file-<?php echo $icone; ?>-o fa-5x"></i>
                         <h4 class="m_1"><a href="solr/detalhes/<?php echo $document['id']; ?>"><?php echo $document["id"]; ?></a></h3>
                         <p class="m_2"><?php echo (isset($document["category_txt_pt"])) ? $document["category_txt_pt"].'<br>' : ''; ?>
-                           
-                        Inserido em <?php echo $document["indexingday_s"] ?> de <?php 
-                        
+
+                        Inserido em <?php echo $document["indexingday_s"] ?> de <?php
+
                         $mes_num = $document["indexingmonth_s"];
-                        
+
                         if($mes_num == 01){
                         $mes_nome = "Janeiro";
                         }elseif($mes_num == 02){
@@ -134,9 +135,9 @@
                         }else{
                         $mes_nome = "Dezembro";
                         }
-                        
+
                        echo $mes_nome; ?> de <?php echo $document["indexingyear_s"] ?></p>
-    
+
                         <a href="<?php echo URL; ?>solr/detalhes/<?php echo $document['id']; ?>" class="feature_btn">Detalhes</a>
                     </div>
 
@@ -163,4 +164,3 @@
            <div class="content_white_narrow">
           </div>
         </div>
-        

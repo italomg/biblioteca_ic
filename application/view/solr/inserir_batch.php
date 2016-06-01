@@ -15,11 +15,12 @@
                       <li><a href="<?php echo URL; ?>solr/listar">Listar Todos</a></li>
                       <li><a href="<?php echo URL; ?>solr/listar_categoria">Listar Categoria/Ano</a></li>
                       <li><a href="<?php echo URL; ?>solr/contato">Contato</a></li>
+                      <li><a href="<?php echo URL; ?>solr/docgenerator">Criar Pauta</a></li>
                       <div class="clear"></div>
                     </ul>
-                    <script type="text/javascript" src="web/js/responsive-nav.js"></script> 
-                                        
-                </div>                          
+                    <script type="text/javascript" src="web/js/responsive-nav.js"></script>
+
+                </div>
                 <div class="clearfix"> </div>
                 <!----//End-top-nav---->
              </div>
@@ -30,7 +31,7 @@
             <div class="footer_top">
                 <div class="container">
                     <div class="footer_head">
-                        
+
                         <h2>Envio de documentos em zip</h2>
                         <p>Preencha os campos para adicionar um novo arquivo</p>
                     </div>
@@ -49,10 +50,10 @@
                             </ul>
                             <div>
                                 <form class="busca-avancada" action="<?php echo URL; ?>solr/enviarArquivoZip" method="POST" enctype="multipart/form-data">
-                                
+
                                     <div class="form-group">
                                         <label>Arquivo-zip</label>
-                                        <input class="form-control" type="file" name="zipToUpload" value="" onchange="validateSingleInput(this);"/>       
+                                        <input class="form-control" type="file" name="zipToUpload" value="" onchange="validateSingleInput(this);"/>
                                     </div>
                                     <div class="form-group">
                                         <label>Signatário</label>
@@ -99,14 +100,14 @@
                                         <label>Sigilo</label>
                                         <select class="form-control" name="secret">
                                             <option value="sim">SIM</option>
-                                            <option value="nao">NÃO</option>                             
+                                            <option value="nao">NÃO</option>
                                         </select>
                                     </div>
 									<div class="form-group">
                                         <label>Anexo</label>
                                         <select class="form-control" name="attachment">
                                             <option value="sim">SIM</option>
-                                            <option value="nao">NÃO</option>                             
+                                            <option value="nao">NÃO</option>
                                         </select>
                                     </div>
                                     <div class="form-group">

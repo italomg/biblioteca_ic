@@ -15,16 +15,17 @@
                       <li><a href="<?php echo URL; ?>solr/listar">Listar Todos</a></li>
                       <li><a href="<?php echo URL; ?>solr/listar_categoria">Listar Categoria/Ano</a></li>
                       <li><a href="<?php echo URL; ?>solr/contato">Contato</a></li>
+                      <li><a href="<?php echo URL; ?>solr/docgenerator">Criar Pauta</a></li>
                       <div class="clear"></div>
                     </ul>
                     <script type="text/javascript" src="web/js/responsive-nav.js"></script>
-                </div>                          
+                </div>
                 <div class="clearfix"> </div>
                 <!----//End-top-nav---->
              </div>
         </div>
         <!----//End-header---->
-    
+
     <?php
         // show documents using the resultset iterator
         foreach ($resultset as $document) {
@@ -97,14 +98,14 @@
                                         <label>Sigilo</label>
                                         <select class="form-control" name="secret">
                                             <option <?php if(isset($document["secret_txt_pt"]) && $document["secret_txt_pt"] == "sim") echo 'selected'; ?> value="sim">SIM</option>
-                                            <option <?php if(isset($document["secret_txt_pt"]) && $document["secret_txt_pt"] == "nao") echo 'selected'; ?> value="nao">NÃO</option>                             
+                                            <option <?php if(isset($document["secret_txt_pt"]) && $document["secret_txt_pt"] == "nao") echo 'selected'; ?> value="nao">NÃO</option>
                                         </select>
                                     </div>
 									<div class="form-group">
                                         <label>Anexo</label>
                                         <select class="form-control" name="attachment">
                                             <option <?php if(isset($document["attachment_txt_pt"]) && $document["attachment_txt_pt"] == "sim") echo 'selected'; ?> value="sim">SIM</option>
-                                            <option <?php if(isset($document["attachment_txt_pt"]) && $document["attachment_txt_pt"] == "nao") echo 'selected'; ?> value="nao">NÃO</option>                            
+                                            <option <?php if(isset($document["attachment_txt_pt"]) && $document["attachment_txt_pt"] == "nao") echo 'selected'; ?> value="nao">NÃO</option>
                                         </select>
                                     </div>
                                     <div class="form-group">

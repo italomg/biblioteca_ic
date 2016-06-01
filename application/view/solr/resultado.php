@@ -15,10 +15,11 @@
                       <li><a href="<?php echo URL; ?>solr/inserir_batch">Inserir Batch</a></li>
                       <li><a href="<?php echo URL; ?>solr/listar">Listar Todos</a></li>
                       <li><a href="<?php echo URL; ?>solr/contato">Contato</a></li>
+                      <li><a href="<?php echo URL; ?>solr/docgenerator">Criar Pauta</a></li>
                       <div class="clear"></div>
                     </ul>
                     <script type="text/javascript" src="web/js/responsive-nav.js"></script>
-                </div>                          
+                </div>
                 <div class="clearfix"> </div>
                 <!----//End-top-nav---->
              </div>
@@ -101,7 +102,7 @@
                   </div>
 
   <?php
-        
+
         echo "</div>";
         if($i%2 == 1) echo "</div>";
 
@@ -118,7 +119,7 @@
   }
 
 ?>
-  
+
 <div class="content_white_narrow"></div>
 
 </div>

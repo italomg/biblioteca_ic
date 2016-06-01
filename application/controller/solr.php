@@ -44,9 +44,9 @@ class Solr extends Controller
         require APP . 'view/solr/listar.php';
         require APP . 'view/_templates/footer.php';
     }
-	
 
-	
+
+
 	/**
      * PAGE: listar_categoria
      * This method handles what happens when you move to http://yourproject/solr/listar_categoria
@@ -57,7 +57,7 @@ class Solr extends Controller
 			$_SESSION['category'] = $_POST["category"];
 			$_SESSION['year'] = $_POST["year"];
         }
-		
+
 		// soh entra se setou ou a categoria ou o ano e sao diferentes de vazio
 		if((isset($_SESSION['category']) || isset($_SESSION['year'])) && (!empty($_SESSION['year']) || !empty($_SESSION['category']))) {
 			// create a client instance
@@ -77,7 +77,7 @@ class Solr extends Controller
 				$query->setQuery('(dateyear_s:'.$_SESSION['year'].') AND (category_txt_pt:"'.$_SESSION['category'].'")');
 				$this->console('(dateyear_s:'.$_SESSION['year'].') AND (category_txt_pt:"'.$_SESSION['category'].'")');
 			}
-		
+
 			// set start and rows param (comparable to SQL limit) using fluent interface
 			$query->setStart(($page-1)*10)->setRows(10);
 
@@ -93,9 +93,9 @@ class Solr extends Controller
         require APP . 'view/solr/listar_categoria.php';
         require APP . 'view/_templates/footer.php';
     }
-	
-	
-	
+
+
+
 	// para debugar
 	private function console( $data ) {
 		if ( is_array( $data ) )
@@ -167,7 +167,7 @@ class Solr extends Controller
         require APP . 'view/solr/inserir.php';
         require APP . 'view/_templates/footer.php';
     }
-    
+
     /**
      * PAGE: inserir_batch
      * This method handles what happens when you move to http://yourproject/solr/inserir
@@ -273,6 +273,33 @@ class Solr extends Controller
     }
 
     /**
+     * PAGE: docgenerator
+     * This method handles what happens when you move to http://yourproject/docgenerator
+     */
+    public function docgenerator($page = 1)
+    {
+        // create a client instance
+        $client = new Solarium\Client($this->config);
+
+        // get a select query instance
+        $query = $client->createQuery($client::QUERY_SELECT);
+
+        // set start and rows param (comparable to SQL limit) using fluent interface
+        $query->setStart(($page-1)*10)->setRows(10);
+
+        // this executes the query and returns the result
+        $resultset = $client->execute($query);
+
+        // display the total number of documents found by solr
+        $number_of_results = $resultset->getNumFound();
+
+        // load views
+        require APP . 'view/_templates/header.php';
+        require APP . 'view/solr/docgenerator.php';
+        require APP . 'view/_templates/footer.php';
+    }
+
+    /**
      * ACTION: enviarArquivo
      * This method handles what happens when you move to http://yourproject/solr/enviarArquivo
      * IMPORTANT: This is not a normal page, it's an ACTION that handles a POST request.
@@ -298,48 +325,48 @@ class Solr extends Controller
 
         // where to go after file has been added
         header('location: ' . URL . 'solr/inserir');
-	
+
         // Cache dump
         header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
         header("Cache-Control: post-check=0, pre-check=0", false);
         header("Pragma: no-cache");
     }
-	
+
 	public function enviarCategoria()
     {
         // if we have POST data
         if (isset($_POST["category"])) {
 			$this->categoria = $_POST["category"];
         }
-		
+
         header('location: ' . URL . 'solr/listar_categoria');
-	
+
         // Cache dump
         header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
         header("Cache-Control: post-check=0, pre-check=0", false);
         header("Pragma: no-cache");
     }
-    
+
     /**
 	 * ACTION: enviarArquivoZip
 	 * This method handles what happens when you move to http://yourproject/solr/enviarArquivoZip
 	 * IMPORTANT: This is not a normal page, it's an ACTION that handles a POST request.
 	 */
-	public function enviarArquivoZip() 
+	public function enviarArquivoZip()
     {
 		$upload_dir = 'temp/';
-		
+
 		if (isset ( $_POST ["submit_add_file"] )) {
 			date_default_timezone_set ( 'America/Sao_Paulo' );
 			$creation = date ( 'Y-m-d_H-i-s' );
-			
+
 			$fname = basename ( $_FILES ['zipToUpload'] ['name'] );
-			
+
 			// recebe vetor ordenado com o nome dos arquivos a serem indexados
 			$flist = $this->batchUpload ( 'zipToUpload', $upload_dir );
-            
+
             $dest_dir = 'download/';
-			
+
 			if ($flist != null && count($flist) != 0) {
 				for($i = 0 ; $i < count($flist); $i++) {
 					// soh tem o imagem, indexa como se fosse o texto
@@ -348,14 +375,14 @@ class Solr extends Controller
 						$this->indexaArquivo($dest_dir.$flist[$i], $flist[$i], false, "");
 						continue;
 					}
-					
+
 					$imagem = "";
-					
+
 					// se nao for o ultimo, ve se o proximo tem
 					// o mesmo nome e termina com _img.pdf
 					// se positivo, indexa os dois, se nao, indexa soh o texto
 					if($i < count($flist)-1) {
-						if($this->endsWith($flist[$i+1], "_img.pdf")) {				
+						if($this->endsWith($flist[$i+1], "_img.pdf")) {
 							$a = str_replace(".pdf", "", $flist[$i]);
 							$a = str_replace(".doc", "", $a);
 							$b = str_replace("_img.pdf", "", $flist[$i+1]);
@@ -367,28 +394,28 @@ class Solr extends Controller
 							}
 						}
 					}
-					
-					rename($upload_dir.$flist[$i], $dest_dir.$flist[$i]);	
+
+					rename($upload_dir.$flist[$i], $dest_dir.$flist[$i]);
 					$this->indexaArquivo($dest_dir.$flist[$i], $flist[$i], false, $imagem);
-					
+
 					// se ja indexou a imagem, pula um indice
 					if(!empty($imagem))
 						$i++;
 				}
 			}
 		}
-		
+
 		// where to go after file has been added
 		header ( 'location: ' . URL . 'solr/inserir_batch' );
-		
+
 		// Cache dump
 		header ( "Cache-Control: no-store, no-cache, must-revalidate, max-age=0" );
 		header ( "Cache-Control: post-check=0, pre-check=0", false );
 		header ( "Pragma: no-cache" );
 	}
-    
+
 	// edicao eh um booleano que indica se a funcao que chamou foi a editaArquivo()
-    function indexaArquivo($fpath, $fname, $edicao, $image ) 
+    function indexaArquivo($fpath, $fname, $edicao, $image )
     {
          // create a client instance
         $client = new Solarium\Client($this->config);
@@ -439,7 +466,7 @@ class Solr extends Controller
         if (!empty($_POST["attachment"])) {
             $doc->attachment_txt_pt = $_POST["attachment"];
         }
-		
+
 		// nao pega a data de indexacao na edicao de arquivo
 		if(!$edicao) {
 			$doc->indexingDate_s = date('Y-m-d');
@@ -452,7 +479,7 @@ class Solr extends Controller
 			$doc->image_s = $image;
 		}
         $query->setDocument($doc);
-        
+
         // this executes the query and returns the result
         $result = $client->extract($query);
 
@@ -465,7 +492,7 @@ class Solr extends Controller
         // this executes the query and returns the result
         $result = $client->update($update);
     }
-    
+
 
     /**
      * ACTION: editarArquivo
@@ -476,13 +503,13 @@ class Solr extends Controller
     {
         // if we have POST data
         if (isset($_POST["submit_edit_file"])) {
-			
+
 			$arr = explode('/', $id);
 
             $fname = end($arr);
 
             $fpath = 'download/' . $fname;
-			
+
             $this->indexaArquivo($fpath, $fname, true,"");
         }
 
@@ -554,7 +581,7 @@ class Solr extends Controller
             } if(!empty($_POST["author"])) {
                 $q .= $prefix . "author_txt_pt:\"" . $_POST["author"] . "\"";
                 $prefix = " AND ";
-            } 
+            }
             if(!empty($_POST["user"])) {
             	$q .= $prefix . "user_s:\"" . $_POST["user"] . "\"";
             	$prefix = " AND ";
@@ -619,33 +646,33 @@ class Solr extends Controller
             require APP . 'view/_templates/footer.php';
         }
     }
-    
+
     /**
      * ACTION: imageUpload
      * IMPORTANT: This is not a normal page, it's an ACTION.
     */
-     
+
     public function fileUpload($input_name, $creation, $i)
     {
         // if we have an id that should be edited
         if ($_FILES[$input_name]['error'][$i] == 0) {
 
             $upload_dir = 'download';
-            
+
             if (!file_exists($upload_dir)) {
                 mkdir($upload_dir, 0755, true);
             }
-            
+
             $target_file = $upload_dir . '/' . basename($_FILES[$input_name]['name'][$i]);
-            
+
             if ( !move_uploaded_file($_FILES[$input_name]["tmp_name"][$i], $target_file) ) {
                 return null;
             }
-            
+
             return $target_file;
         }
     }
-    
+
     	/**
 	 * ACTION: batchUpload
 	 * IMPORTANT: This is not a normal page, it's an ACTION.
@@ -656,27 +683,27 @@ class Solr extends Controller
 			if (! file_exists ( $upload_dir )) {
 				mkdir ( $upload_dir, 0755, true );
 			}
-			
+
 			// esvazia o diretorio temp
 			else {
 				$files1 = scandir ( $upload_dir );
-				foreach($files1 as $f){ 
+				foreach($files1 as $f){
 				  if(is_file($f))
 					unlink($f);
 				}
 			}
-			
+
 			$target_file = $upload_dir . '/' . basename ( $_FILES [$input_name] ['name'] );
-			
+
 			if (file_exists ( $target_file )) {
 				unlink ( $target_file );
 			}
-			
+
 			if (! move_uploaded_file ( $_FILES [$input_name] ["tmp_name"], $target_file )) {
 				echo "Erro ao mover arquivo".$_FILES [$input_name] ["tmp_name"]." para ".$target_file;
 				return null;
 			}
-			
+
 			// extrai .zip
 			if ($this->endsWith ( $target_file, ".zip" )) {
 				$zip = new ZipArchive ();
@@ -687,60 +714,60 @@ class Solr extends Controller
 					echo 'Erro ao extrair arquivo zip';
 					return null;
 				}
-				
+
 				unlink ( $target_file );
-			} 			
+			}
 
 			// .tar.gz
 			else {
 				$pos = strrpos ( $target_file, ".tar.gz" );
 				$tar_file = null;
-				
+
 				if ($pos !== false) {
 					$tar_file = substr_replace ( $target_file, ".tar", $pos, strlen ( ".tar.gz" ) );
-				} 
+				}
 
 				else {
 					echo "Erro ao extrair o arquivo: " . $target_file;
 				}
-				
+
 				if (file_exists ( $tar_file ))
 					unlink ( $target_file );
-				
+
 				try {
 					// decompress from gz
 					$p = new PharData ( $target_file );
 					$p->decompress ();
-					
+
 					// unarchive from the tar
 					$phar = new PharData ( $tar_file );
 					$phar->extractTo ( $upload_dir );
-					
+
 					unlink ( $target_file );
 					unlink ( $tar_file );
 				} catch ( Exception $e ) {
 					echo "Erro ao extrair o arquivo " . $_FILES [$input_name] ['name'] . ". para " . $target_file;
 					echo "<br>Certifique-se de que o repositorio temp esta vazio<br>";
-					
+
 					unlink ( $target_file );
 					unlink ( $tar_file );
-					
+
 					return null;
 				}
 			}
-			
+
 			// pega os arquivos do diretorio
 			$files1 = scandir ( $upload_dir );
-			
+
 			// remove . e ..
 			if (($key = array_search ( '.', $files1 )) !== false) {
 				unset ( $files1 [$key] );
 			}
-			
+
 			if (($key = array_search ( '..', $files1 )) !== false) {
 				unset ( $files1 [$key] );
 			}
-			
+
             // remove os arquivos que nao terminam com .pdf ou .doc
             foreach($files1 as $f) {
                 if(!($this->endsWith($f, ".pdf") || $this->endsWith($f, ".doc"))) {
@@ -748,18 +775,18 @@ class Solr extends Controller
                     unlink ( $upload_dir."/".$f);
                 }
             }
-			
+
 			asort($files1);
-			
+
 			$flist = [];
-			
+
 			// associa os valores do array com o indice
 			$i = 0 ;
 			foreach($files1 as $f) {
 				$flist[$i] = $f;
 				$i++;
 			}
-			
+
 			return $flist;
 		}
 	}
