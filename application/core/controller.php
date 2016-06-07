@@ -27,13 +27,14 @@ class Controller
     /**
      * USE THIS ONLY IF YOU NEED A DATABASE CONNECTION!
      * Whenever controller is created, open a database connection too and load "the model".
-     
+     */
+
     function __construct()
     {
         $this->openDatabaseConnection();
         $this->loadModel();
     }
-     */
+
 
     /**
      * Open the database connection with the credentials from application/config/config.php

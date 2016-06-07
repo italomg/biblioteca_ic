@@ -454,10 +454,6 @@ ul.test_box li.test_desc p {
 	border-bottom: 1px solid #597275;
 	padding-bottom: 3em;
 }
-.footer_head_notaligned{	
-	border-bottom: 1px solid #597275;
-	padding-bottom: 3em;
-}
 .footer_head_narrow{
 	text-align: center;
 }
@@ -494,6 +490,12 @@ i.msg_icon{
 	height: 40px;
 	background: url(../images/img-sprite.png) no-repeat -176px -97px;
 	display: inline-block;
+}
+ul.message li.msg-desc h4{
+	font-size: 1.1em;
+	font-weight: bold;
+	color:#fff;
+	text-decoration: none;
 }
 ul.message li.msg-desc h4 a{
 	font-size: 1.1em;
@@ -533,6 +535,7 @@ ul.message li.msg-desc p{
 	width:80%;
 	margin-right: 10px;
 }
+
 .busca-avancada input[type="text"],
 .busca-avancada input[type="date"],
 .busca-avancada input[type="file"],
@@ -545,6 +548,7 @@ ul.message li.msg-desc p{
 	-moz-border-radius:5px;
 	-o-border-radius:5px;
 }
+
 .busca-avancada input[type="submit"],
 .subscribe input[type="submit"] {
 	background: #597275;
@@ -561,6 +565,7 @@ ul.message li.msg-desc p{
 	transition: all 0.3s;
 	-o-transition: all 0.3s;
 }
+
 .busca-avancada input[type="submit"]:hover,
 .subscribe input[type="submit"]:hover {
 	background:#e4551d;
@@ -568,6 +573,7 @@ ul.message li.msg-desc p{
 .busca-avancada label {
 	color: white;
 }
+
 ul.twitter{
 	padding: 1em 2em;
 	list-style:none;
@@ -1642,6 +1648,9 @@ ul.test_box li.test_desc {
 ul.message li.msg-desc {
 	width: 75%;
 }
+ul.message li.msg-desc h4{
+	font-size: 0.85em;
+}
 ul.message li.msg-desc h4 a {
 	font-size: 0.85em;
 }
@@ -1664,7 +1673,7 @@ h3.m_1 {
 	padding: 0.5em 0;
 }
 ul.twitter li.twt_desc {
-	width: 63%;
+	width: 100%;
 }
 ul.twitter li.twt_desc p {
 	font-size: 0.8125em;
@@ -1765,4 +1774,127 @@ input.text {
 }
 .bs-callout-info h4 {
     color: #5bc0de;
+}
+
+/* CSS para o sistema de pautas */
+
+.footer_head_notaligned{
+  margin-bottom: 2em;
+	border-bottom: 1px solid #597275;
+  padding-bottom: 2em;
+  display: inline-block;
+}
+
+.expediente_border{
+  border: 3px solid #416e74;
+  border-radius: 1em;
+  padding-bottom: 4em;
+  min-width: 100%;
+  display: inline-block;
+}
+
+.ciencia_border{
+  border: 3px solid #556633;
+  border-radius: 1em;
+  padding-bottom: 4em;
+  min-width: 100%;
+  display: inline-block;
+}
+
+.odia_border{
+  border: 3px solid #443366;
+  border-radius: 1em;
+  padding-bottom: 4em;
+  min-width: 100%;
+  display: inline-block;
+}
+
+.homo_border{
+  border: 3px solid #ab3030;
+  border-radius: 1em;
+  padding-bottom: 4em;
+  min-width: 100%;
+  display: inline-block;
+}
+
+.item_pauta_exp{
+ background: #416e74;/*#597275;*/
+ font-weight: bold;
+ border: 2px solid #416e74;
+ border-radius: 10px;
+ padding: 8px 15px;
+ cursor: pointer;
+ color: #FFF;
+ outline: none;
+ font-size: 0.9em;
+ margin-top: 5px;
+ -webkit-transition: all 0.3s;
+ -moz-transition: all 0.3s;
+ transition: all 0.3s;
+ -o-transition: all 0.3s;
+}
+
+.item_pauta_ciencia{
+ background: #556633;/*#597275;*/
+ font-weight: bold;
+ border: 2px solid #556633;
+ border-radius: 10px;
+ padding: 8px 15px;
+ cursor: pointer;
+ color: #FFF;
+ outline: none;
+ font-size: 0.9em;
+ margin-top: 5px;
+ -webkit-transition: all 0.3s;
+ -moz-transition: all 0.3s;
+ transition: all 0.3s;
+ -o-transition: all 0.3s;
+}
+
+.item_pauta_odia{
+ background: #443366;/*#597275;*/
+ font-weight: bold;
+ border: 2px solid #443366;
+ border-radius: 10px;
+ padding: 8px 15px;
+ cursor: pointer;
+ color: #FFF;
+ outline: none;
+ font-size: 0.9em;
+ margin-top: 5px;
+ -webkit-transition: all 0.3s;
+ -moz-transition: all 0.3s;
+ transition: all 0.3s;
+ -o-transition: all 0.3s;
+}
+
+.item_pauta_homo{
+ background: #ab3030;/*#597275;*/
+ font-weight: bold;
+ border: 2px solid #ab3030;
+ border-radius: 10px;
+ padding: 8px 15px;
+ cursor: pointer;
+ color: #FFF;
+ outline: none;
+ font-size: 0.9em;
+ margin-top: 5px;
+ -webkit-transition: all 0.3s;
+ -moz-transition: all 0.3s;
+ transition: all 0.3s;
+ -o-transition: all 0.3s;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+ul.item_ul{
+	padding-bottom: 3em;
+  padding-right: 1em;
+  padding-top: 1em;
+  padding-left: 1em;
+	list-style:none;
 }

@@ -18,6 +18,29 @@ session_start();
 $imageLink = "";
 class Solr extends Controller
 {
+
+  /**
+   * PAGE: index
+   * This method handles what happens when you move to http://yourproject/generator/index (which is the default page btw)
+   */
+
+  public function schedule(){
+
+    $busca_n = 1;
+    $reuniao = $this->model->getReuniao();
+    $reuniao = array_values(get_object_vars($reuniao[0]));
+    $cur_ano_reuniao = $reuniao[1];
+    $cur_num_reuniao = $reuniao[0];
+
+    $Available = $this->model->getAvailable();
+    $InUse = $this->model->getInUse();
+    //Itens tem que ter um campo dizendo qual sua reuniao, qual seu tipo e uma descricao
+    // load views
+    require APP . 'view/_templates/header.php';
+    require APP . 'view/solr/schedule.php';
+    require APP . 'view/_templates/footer.php';
+  }
+
     /**
      * PAGE: listar
      * This method handles what happens when you move to http://yourproject/solr/listar
@@ -204,6 +227,7 @@ class Solr extends Controller
         require APP . 'view/_templates/footer.php';
     }
 
+
     /**
      * PAGE: editar
      * This method handles what happens when you move to http://yourproject/solr/editar
@@ -272,32 +296,6 @@ class Solr extends Controller
         require APP . 'view/_templates/footer.php';
     }
 
-    /**
-     * PAGE: docgenerator
-     * This method handles what happens when you move to http://yourproject/docgenerator
-     */
-    public function docgenerator($page = 1)
-    {
-        // create a client instance
-        $client = new Solarium\Client($this->config);
-
-        // get a select query instance
-        $query = $client->createQuery($client::QUERY_SELECT);
-
-        // set start and rows param (comparable to SQL limit) using fluent interface
-        $query->setStart(($page-1)*10)->setRows(10);
-
-        // this executes the query and returns the result
-        $resultset = $client->execute($query);
-
-        // display the total number of documents found by solr
-        $number_of_results = $resultset->getNumFound();
-
-        // load views
-        require APP . 'view/_templates/header.php';
-        require APP . 'view/solr/docgenerator.php';
-        require APP . 'view/_templates/footer.php';
-    }
 
     /**
      * ACTION: enviarArquivo

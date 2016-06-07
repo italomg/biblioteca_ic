@@ -19,6 +19,38 @@ class Model
         }
     }
 
+
+    public function getAvailable(){
+      $sql = "SELECT * FROM itens WHERE in_use = False";
+      $query = $this->db->prepare($sql);
+      $query->execute();
+      return $query->fetchAll();
+    }
+    public function getInUse(){
+      $sql = "SELECT * FROM itens WHERE in_use = True";
+      $query = $this->db->prepare($sql);
+      $query->execute();
+      return $query->fetchAll();
+    }
+    public function getReuniao(){
+      $sql = "SELECT max(num_reuniao), max(ano_reuniao) FROM itens";
+      $query = $this->db->prepare($sql);
+      $query->execute();
+      return $query->fetchAll();
+    }
+    public function setAvailable($name){
+      $sql = "SELECT max(num_reuniao), max(ano_reuniao) FROM itens";
+      $query = $this->db->prepare($sql);
+      $query->execute();
+      return $query->fetchAll();
+    }
+    public function setInUser($name){
+      $sql = "SELECT max(num_reuniao), max(ano_reuniao) FROM itens";
+      $query = $this->db->prepare($sql);
+      $query->execute();
+      return $query->fetchAll();
+    }
+
     /**
      * Get all songs from database
      */
