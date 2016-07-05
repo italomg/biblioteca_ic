@@ -50,11 +50,11 @@
                                 <form class="busca-avancada" action="<?php echo URL; ?>solr/enviarArquivo" method="POST" enctype="multipart/form-data">
                                     <div class="form-group">
                                         <label>Arquivo-texto</label>
-                                        <input class="form-control" type="file" name="userfile[]" required />
+                                        <input class="form-control" type="file" name="userfile[]" onchange="validateSingleInput2(this);" required />
                                     </div>
 									<div class="form-group">
                                         <label>Arquivo-imagem</label>
-                                        <input class="form-control" type="file" name="userfile[]" value="" />
+                                        <input class="form-control" type="file" name="userfile[]" value="" onchange="validateSingleInput2(this);" />
                                     </div>
                                     <div class="form-group">
                                         <label>Signatário</label>

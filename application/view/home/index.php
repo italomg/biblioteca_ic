@@ -103,7 +103,10 @@
 ?>
                     <div class="col-md-3 feature_grid<?php echo ($i == 4) ? '2' : '1'; ?>">
                         <i class="fa fa-file-<?php echo $icone; ?>-o fa-5x"></i>
-                        <h4 class="m_1"><a href="solr/detalhes/<?php echo $document['id']; ?>"><?php echo $document["id"]; ?></a></h3>
+                        
+                        <!-- substr($document["id"], 1) pois a string id comeca com /  -->
+                        
+                        <h4 class="m_1"><a href="solr/detalhes/<?php echo $document['id']; ?>"><?php echo substr($document["id"], 1) ; ?></a></h3>
                         <p class="m_2"><?php echo (isset($document["category_txt_pt"])) ? $document["category_txt_pt"].'<br>' : ''; ?>
 
                         Inserido em <?php echo $document["indexingday_s"] ?> de <?php

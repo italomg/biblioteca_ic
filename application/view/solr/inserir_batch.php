@@ -50,11 +50,31 @@
                             </ul>
                             <div>
                                 <form class="busca-avancada" action="<?php echo URL; ?>solr/enviarArquivoZip" method="POST" enctype="multipart/form-data">
-
                                     <div class="form-group">
                                         <label>Arquivo-zip</label>
-                                        <input class="form-control" type="file" name="zipToUpload" value="" onchange="validateSingleInput(this);"/>
+                                        <input class="form-control" max-size="500000000" type="file" name="zipToUpload" value="" onchange="validateSingleInput(this);"/>
+                                   
+                                        <script>
+                                            $(function(){
+                                                $('form').submit(function(){
+                                                    var isOk = false;
+                                                    $('input[type=file][max-size]').each(function(){
+                                                        if(typeof this.files[0] !== 'undefined'){
+                                                            var maxSize = parseInt($(this).attr('max-size'),10),
+                                                            size = this.files[0].size;
+                                                            isOk = maxSize > size;
+                                                            if(isOk == false) {
+                                                                alert('O tamanho máximo para o arquivo-zip é '  + maxSize/1000000 + ' MB.');
+                                                            }
+                                                            return isOk;
+                                                        }
+                                                    });
+                                                    return true;
+                                                });
+                                            });
+                                        </script>  
                                     </div>
+
                                     <div class="form-group">
                                         <label>Signatário</label>
                                         <input class="form-control" type="text" name="signer" value=""/>
