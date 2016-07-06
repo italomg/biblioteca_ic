@@ -7,12 +7,15 @@
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="<?php echo URL; ?>js/jquery.min.js"></script>
 <script src="<?php echo URL; ?>js/jquery.toaster.js"></script>
-<script type="text/javascript" src="<?php echo URL; ?>js/biblioteca.js" charset="UTF-8"></script>  
+<script type="text/javascript" src="<?php echo URL; ?>js/biblioteca.js" charset="UTF-8"></script>
+<!-- Sweet Alert CSS/JS files -->
+<script type="text/javascript" src="<?php echo URL; ?>js/sweetalert2.min.js"></script>
+<link rel="stylesheet" type="text/css" href="<?php echo URL; ?>css/sweetalert2.css">
 
 <!---- start-smoth-scrolling---->
 <script type="text/javascript">
         jQuery(document).ready(function($) {
-            $(".scroll").click(function(event){     
+            $(".scroll").click(function(event){
                 event.preventDefault();
                 $('html,body').animate({scrollTop:$(this.hash).offset().top},1200);
             });
@@ -49,4 +52,5 @@
         </script>
         <!----//End-top-nav-script---->
 </script>
+
 </head>

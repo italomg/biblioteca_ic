@@ -34,12 +34,133 @@ class Solr extends Controller
 
     $Available = $this->model->getAvailable();
     $InUse = $this->model->getInUse();
+    $Informes = $this->model->getInformes($cur_num_reuniao, $cur_ano_reuniao);
     //Itens tem que ter um campo dizendo qual sua reuniao, qual seu tipo e uma descricao
     // load views
+    //var_dump($Informes);
     require APP . 'view/_templates/header.php';
     require APP . 'view/solr/schedule.php';
     require APP . 'view/_templates/footer.php';
   }
+
+  public function set_handler(){
+
+    $aResult = '';
+
+    if(!isset($_POST['functionname'])){
+       $aResult = 'Nome da funcao invalido!';
+    }
+    if(!isset($_POST['arguments']) || (count($_POST['arguments']) != 3)){
+       $aResult = 'Argumentos invalidos!';
+    }
+    $name = $_POST['arguments'][0];
+    $num_reuniao = $_POST['arguments'][1];
+    $ano_reuniao = $_POST['arguments'][2];
+
+    if($aResult == ''){
+      switch($_POST['functionname']) {
+        case 'set_inUse':
+          $this->model->set_inUse($name, $num_reuniao, $ano_reuniao);
+          $aResult = 'Item Adicionado a Pauta com Sucesso';
+          break;
+        case 'set_available':
+          $this->model->set_available($name, $num_reuniao, $ano_reuniao);
+          $aResult = 'Item Removido da Pauta com Sucesso';
+          break;
+        default:
+           $aResult = 'Funcao: '.$_POST['functionname'].', nao pode ser encontrada!';
+           break;
+        }
+    }
+
+    echo json_encode($aResult);
+  }
+
+  public function informe_handler(){
+
+    $aResult = '';
+    $rowMod = 0;
+
+    if(!isset($_POST['functionname'])){
+       $aResult = 'Nome da funcao invalido!';
+    }
+    if(!isset($_POST['arguments']) || (count($_POST['arguments']) != 3)){
+       $aResult = 'Numero de argumentos invalidos!';
+    }
+    if($_POST['arguments'][0] == ""){
+      $aResult = 'Informe em branco!';
+    }
+
+    $informe = $_POST['arguments'][0];
+    $num_reuniao = $_POST['arguments'][1];
+    $ano_reuniao = $_POST['arguments'][2];
+
+    if($aResult == ''){
+      switch($_POST['functionname']) {
+        case 'add_informe':
+          $rowMod = $this->model->add_informe($informe, $num_reuniao, $ano_reuniao);
+          $aResult = 'Informe Adicionado com Sucesso';
+          break;
+        case 'remove_informe':
+          $rowMod = $this->model->remove_informe($informe, $num_reuniao, $ano_reuniao);
+          $aResult = 'Informe Removido com Sucesso';
+          break;
+        default:
+           $aResult = 'Funcao: '.$_POST['functionname'].', nao pode ser encontrada!';
+           break;
+        }
+    }
+
+    echo json_encode($aResult);
+    echo json_encode($rowMod);
+  }
+
+  public function buscaPauta(){
+
+    $nome = '';
+    $tipo = '';
+    $ano_reuniao = -1;
+    $num_reuniao = -1;
+
+    if(isset($_POST['nome'])){
+       $nome = $_POST['nome'];
+    }
+    if(isset($_POST['num_reuniao'])){
+       $num_reuniao = $_POST['num_reuniao'];
+    }
+    if(isset($_POST['ano_reuniao'])){
+       $ano_reuniao = $_POST['ano_reuniao'];
+    }
+    if(isset($_POST['tipo'])){
+       $tipo = $_POST['tipo'];
+    }
+
+    $Available_cur = $this->model->buscaPauta($nome, $num_reuniao, $ano_reuniao, $tipo);
+    $InUse = $this->model->getInUse();
+
+    $busca_n = 1;
+    $reuniao = $this->model->getReuniao();
+    $reuniao = array_values(get_object_vars($reuniao[0]));
+
+    $cur_ano_reuniao = $reuniao[1];
+    $cur_num_reuniao = $reuniao[0];
+
+    $Informes = $this->model->getInformes($cur_num_reuniao, $cur_ano_reuniao);
+
+    require APP . 'view/_templates/header.php';
+    require APP . 'view/solr/schedule.php';
+    require APP . 'view/_templates/footer.php';
+
+    // Cache dump
+    //header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+    //header("Cache-Control: post-check=0, pre-check=0", false);
+    //header("Pragma: no-cache");
+  }
+
+  public function geraDoc(){
+    var_dump($_POST);
+  }
+
 
     /**
      * PAGE: listar

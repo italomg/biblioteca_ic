@@ -19,35 +19,139 @@ class Model
         }
     }
 
+    public function getInformes($num_reuniao, $ano_reuniao){
+
+      $sql = "SELECT informe FROM informes WHERE num_reuniao = :num_reuniao AND ano_reuniao = :ano_reuniao";
+      $query = $this->db->prepare($sql);
+      $parameters = array(':num_reuniao' => $num_reuniao, ':ano_reuniao' => $ano_reuniao);
+
+      $query->execute($parameters);
+      $res = $query->fetchAll();
+      if(count($res) == 0){
+        $res = new stdClass;
+        $res->informe = "";
+        return array($res);
+      } else{
+        return $res;
+      }
+    }
 
     public function getAvailable(){
+
       $sql = "SELECT * FROM itens WHERE in_use = False";
       $query = $this->db->prepare($sql);
+
       $query->execute();
       return $query->fetchAll();
     }
+
     public function getInUse(){
+
       $sql = "SELECT * FROM itens WHERE in_use = True";
       $query = $this->db->prepare($sql);
+
       $query->execute();
       return $query->fetchAll();
     }
+
     public function getReuniao(){
+
       $sql = "SELECT max(num_reuniao), max(ano_reuniao) FROM itens";
       $query = $this->db->prepare($sql);
+
       $query->execute();
       return $query->fetchAll();
     }
-    public function setAvailable($name){
-      $sql = "SELECT max(num_reuniao), max(ano_reuniao) FROM itens";
+
+    public function set_available($name, $num_reuniao, $ano_reuniao){
+
+      $name = str_replace(' ', '', $name);
+      $sql = "UPDATE itens SET in_use=False WHERE short_name = :name AND num_reuniao = :num_reuniao AND ano_reuniao = :ano_reuniao";
       $query = $this->db->prepare($sql);
-      $query->execute();
-      return $query->fetchAll();
+      $parameters = array(':name' => $name, ':num_reuniao' => $num_reuniao, ':ano_reuniao' => $ano_reuniao);
+
+      $query->execute($parameters);
     }
-    public function setInUser($name){
-      $sql = "SELECT max(num_reuniao), max(ano_reuniao) FROM itens";
+
+    public function set_inUse($name, $num_reuniao, $ano_reuniao){
+
+      $name = str_replace(' ', '', $name);
+      $sql = "UPDATE itens SET in_use=True WHERE short_name = :name AND num_reuniao = :num_reuniao AND ano_reuniao = :ano_reuniao";
       $query = $this->db->prepare($sql);
+      $parameters = array(':name' => $name, ':num_reuniao' => $num_reuniao, ':ano_reuniao' => $ano_reuniao);
+
+      $query->execute($parameters);
+    }
+
+    public function add_informe($informe, $num_reuniao, $ano_reuniao){
+
+      $sql = "INSERT INTO informes VALUES (:informe, :num_reuniao, :ano_reuniao)";
+      $query = $this->db->prepare($sql);
+      $parameters = array(':informe' => $informe, ':num_reuniao' => $num_reuniao, ':ano_reuniao' => $ano_reuniao);
+
+      $query->execute($parameters);
+
+      return $query->rowCount();
+    }
+
+    public function remove_informe($informe, $num_reuniao, $ano_reuniao){
+
+      $sql = "DELETE FROM informes WHERE informe = :informe AND num_reuniao = :num_reuniao AND ano_reuniao = :ano_reuniao";
+      $query = $this->db->prepare($sql);
+      $parameters = array(':informe' => $informe, ':num_reuniao' => $num_reuniao, ':ano_reuniao' => $ano_reuniao);
+
+      $query->execute($parameters);
+
+      return $query->rowCount();
+    }
+
+    public function buscaPauta($name, $num_reuniao, $ano_reuniao, $tipo){
+
+      $name = str_replace(' ', '', $name);
+      $tipo = str_replace(' ', '', $tipo);
+      $name = "%" . $name . "%";
+      $sql = "SELECT * FROM itens WHERE in_use = False ";
+
+      $num_str = "num_reuniao = :num_reuniao ";
+      $and_str = "AND ";
+      $ano_str = "ano_reuniao = :ano_reuniao ";
+      $name_str = "short_name LIKE :name ";
+      $tipo_str = "tipo = :tipo ";
+
+      if($name != ''){
+        $sql = $sql . $and_str;
+        $sql = $sql . $name_str;
+      }
+      if($num_reuniao > 0){
+          $sql = $sql . $and_str;
+          $sql = $sql . $num_str;
+      }
+      if($ano_reuniao > 0){
+          $sql = $sql . $and_str;
+          $sql = $sql . $num_str;
+      }
+      if($tipo != ''){
+        $sql = $sql . $and_str;
+        $sql = $sql . $tipo_str;
+      }
+
+      $query = $this->db->prepare($sql);
+
+      if($name != ''){
+        $query->bindParam(':name', $name);
+      }
+      if($num_reuniao > 0){
+        $query->bindParam(':num_reuniao', $num_reuniao);
+      }
+      if($ano_reuniao > 0){
+        $query->bindParam(':ano_reuniao', $ano_reuniao);
+      }
+      if($tipo != ''){
+        $query->bindParam(':tipo', $tipo);
+      }
+
       $query->execute();
+
       return $query->fetchAll();
     }
 
