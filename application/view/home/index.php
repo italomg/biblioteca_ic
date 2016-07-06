@@ -152,18 +152,5 @@
             </div>
            </div>
 
-           <div class="content_white_narrow">
-          </div>
 
-           <div class="content_orange">
-              <div class="col-xs-6 text-right">
-                <h2>Powered by</h2>
-              </div>
-              <div class="col-xs-6 text-left">
-                <img src="../images/solrbadge.png">
-              </div>
-           </div>
-
-           <div class="content_white_narrow">
-          </div>
         </div>
