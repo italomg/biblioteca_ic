@@ -55,27 +55,27 @@
                                 <form class="busca-avancada" action="<?php echo URL; ?>solr/editarArquivo/<?php echo $id; ?>" method="POST">
                                     <div class="form-group">
                                         <label>Autor</label>
-                                        <input class="form-control" type="text" name="author" value="<?php echo (isset($document["author_txt_pt"])) ? $document["author_txt_pt"] : ''; ?>" required/>
+                                        <input class="form-control" type="text" name="author" value="<?php echo (isset($document["author_txt_pt"])) ? $document["author_txt_pt"] : ''; ?>"/>
                                     </div>
                                     <div class="form-group">
                                         <label>Data de producão</label>
-                                        <input class="form-control" type="date" name="fileDate" value="<?php echo (isset($document["date_s"])) ? $document["date_s"] : ''; ?>" required/>
+                                        <input class="form-control" type="date" name="fileDate" value="<?php echo (isset($document["date_s"])) ? $document["date_s"] : ''; ?>"/>
                                     </div>
                                     <div class="form-group">
                                         <label>Signatário</label>
-                                        <input class="form-control" type="text" name="signer" value="<?php echo (isset($document["signer_txt_pt"])) ? $document["signer_txt_pt"] : ''; ?>" required/>
+                                        <input class="form-control" type="text" name="signer" value="<?php echo (isset($document["signer_txt_pt"])) ? $document["signer_txt_pt"] : ''; ?>"/>
                                     </div>
                                     <div class="form-group">
                                         <label>Destinatário</label>
-                                        <input class="form-control" type="text" name="receiver" value="<?php echo (isset($document["receiver_txt_pt"])) ? $document["receiver_txt_pt"] : ''; ?>" required/>
+                                        <input class="form-control" type="text" name="receiver" value="<?php echo (isset($document["receiver_txt_pt"])) ? $document["receiver_txt_pt"] : ''; ?>"/>
                                     </div>
                                     <div class="form-group">
                                         <label>Setor</label>
-                                        <input class="form-control" type="text" name="sector" value="<?php echo (isset($document["sector_txt_pt"])) ? $document["sector_txt_pt"] : ''; ?>" required/>
+                                        <input class="form-control" type="text" name="sector" value="<?php echo (isset($document["sector_txt_pt"])) ? $document["sector_txt_pt"] : ''; ?>"/>
                                     </div>
                                     <div class="form-group">
                                         <label>Identificacão</label>
-                                        <input class="form-control" type="text" name="identification" value="<?php echo (isset($document["identification_txt_pt"])) ? $document["identification_txt_pt"] : ''; ?>" required/>
+                                        <input class="form-control" type="text" name="identification" value="<?php echo (isset($document["identification_txt_pt"])) ? $document["identification_txt_pt"] : ''; ?>"/>
                                     </div>
                                     <div class="form-group">
                                         <label>Espécie</label>
@@ -92,7 +92,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label>Assunto</label>
-                                        <input class="form-control" type="text" name="subject" value="<?php echo (isset($document["subject_txt_pt"])) ? $document["subject_txt_pt"] : ''; ?>" required/>
+                                        <input class="form-control" type="text" name="subject" value="<?php echo (isset($document["subject_txt_pt"])) ? $document["subject_txt_pt"] : ''; ?>"/>
                                     </div>
                                     <div class="form-group">
                                         <label>Sigilo</label>

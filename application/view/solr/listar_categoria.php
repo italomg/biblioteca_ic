@@ -31,7 +31,7 @@
             <div class="footer_top">
                 <div class="container">
                     <div class="footer_head_narrow">
-                        <h2>Escolha uma categoria</h2>
+                        <h2>Escolha uma categoria e/ou um ano</h2>
                     </div>
 
                      <form class="busca-avancada" action="<?php echo URL; ?>solr/listar_categoria" method="POST" enctype="multipart/form-data">
