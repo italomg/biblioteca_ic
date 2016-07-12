@@ -48,6 +48,7 @@
                                             <option <?php if(isset($_SESSION['category']) && $_SESSION['category'] == "Ata de CI") echo 'selected'; ?> value="Ata de CI">Ata de CI</option>
                                             <option <?php if(isset($_SESSION['category']) && $_SESSION['category'] == "Pauta de CI") echo 'selected'; ?> value="Pauta de CI">Pauta de CI</option>
                                             <option <?php if(isset($_SESSION['category']) && $_SESSION['category'] == "Deliberação de CI") echo 'selected'; ?> value="Deliberação de CI">Deliberação de CI</option>
+                                            <option <?php if(isset($_SESSION['category']) && $_SESSION['category'] == "Outros") echo 'selected'; ?> value="Outros">Outros</option>
                                 </select>
                                 </div>
 
