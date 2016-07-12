@@ -540,6 +540,7 @@ ul.message li.msg-desc p{
 .busca-avancada input[type="date"],
 .busca-avancada input[type="file"],
 .busca-avancada input[type="submit"],
+.busca-avancada input[type="button"],
 .busca-avancada select,
 .subscribe input[type="text"],
 .subscribe input[type="submit"]{
@@ -550,6 +551,7 @@ ul.message li.msg-desc p{
 }
 
 .busca-avancada input[type="submit"],
+.busca-avancada input[type="button"],
 .subscribe input[type="submit"] {
 	background: #597275;
 	font-weight: bold;
@@ -567,6 +569,7 @@ ul.message li.msg-desc p{
 }
 
 .busca-avancada input[type="submit"]:hover,
+.busca-avancada input[type="button"]:hover,
 .subscribe input[type="submit"]:hover {
 	background:#e4551d;
 }
