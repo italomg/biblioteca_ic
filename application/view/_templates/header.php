@@ -8,9 +8,14 @@
 <script src="<?php echo URL; ?>js/jquery.min.js"></script>
 <script src="<?php echo URL; ?>js/jquery.toaster.js"></script>
 <script type="text/javascript" src="<?php echo URL; ?>js/biblioteca.js" charset="UTF-8"></script>
+
 <!-- Sweet Alert CSS/JS files -->
 <script type="text/javascript" src="<?php echo URL; ?>js/sweetalert2.min.js"></script>
 <link rel="stylesheet" type="text/css" href="<?php echo URL; ?>css/sweetalert2.css">
+
+<!-- <script type="text/javascript" src="web/js/responsive-nav.js"></script> -->
+<script src="https://cdn.jsdelivr.net/promise.prototype.finally/1.0.1/finally.js"></script>
+<!-- <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script> -->
 
 <!---- start-smoth-scrolling---->
 <script type="text/javascript">

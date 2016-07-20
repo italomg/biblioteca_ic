@@ -24,6 +24,7 @@ class Solr extends Controller
    * This method handles what happens when you move to http://yourproject/generator/index (which is the default page btw)
    */
 
+  /*
   public function schedule(){
 
     $busca_n = 1;
@@ -37,7 +38,50 @@ class Solr extends Controller
     $Informes = $this->model->getInformes($cur_num_reuniao, $cur_ano_reuniao);
     //Itens tem que ter um campo dizendo qual sua reuniao, qual seu tipo e uma descricao
     // load views
-    //var_dump($Informes);
+
+    require APP . 'view/_templates/header.php';
+    require APP . 'view/solr/schedule.php';
+    require APP . 'view/_templates/footer.php';
+  }*/
+
+  public function schedule(){
+
+    $nome = '';
+    $tipo = '';
+    $ano_reuniao = -1;
+    $num_reuniao = -1;
+
+    if(isset($_POST['nome'])){
+       $nome = $_POST['nome'];
+    }
+    if(isset($_POST['num_reuniao'])){
+       $num_reuniao = $_POST['num_reuniao'];
+    }
+    if(isset($_POST['ano_reuniao'])){
+       $ano_reuniao = $_POST['ano_reuniao'];
+    }
+    if(isset($_POST['tipo'])){
+       $tipo = $_POST['tipo'];
+    }
+
+    //var_dump($_POST);
+
+    $busca_n = 1;
+    $reuniao = $this->model->getReuniao();
+    $reuniao = array_values(get_object_vars($reuniao[0]));
+    $cur_ano_reuniao = $reuniao[1];
+    $cur_num_reuniao = $reuniao[0];
+
+
+    if($nome == '' && $tipo == '' && $ano_reuniao == -1 && $num_reuniao == -1){
+      $Available = $this->model->getAvailable();
+    }
+    else{
+      $Available_cur = $this->model->buscaPauta($nome, $num_reuniao, $ano_reuniao, $tipo);
+    }
+    $InUse = $this->model->getInUse();
+    $Informes = $this->model->getInformes($cur_num_reuniao, $cur_ano_reuniao);
+
     require APP . 'view/_templates/header.php';
     require APP . 'view/solr/schedule.php';
     require APP . 'view/_templates/footer.php';
@@ -115,50 +159,17 @@ class Solr extends Controller
     echo json_encode($rowMod);
   }
 
-  public function buscaPauta(){
-
-    $nome = '';
-    $tipo = '';
-    $ano_reuniao = -1;
-    $num_reuniao = -1;
-
-    if(isset($_POST['nome'])){
-       $nome = $_POST['nome'];
-    }
-    if(isset($_POST['num_reuniao'])){
-       $num_reuniao = $_POST['num_reuniao'];
-    }
-    if(isset($_POST['ano_reuniao'])){
-       $ano_reuniao = $_POST['ano_reuniao'];
-    }
-    if(isset($_POST['tipo'])){
-       $tipo = $_POST['tipo'];
-    }
-
-    $Available_cur = $this->model->buscaPauta($nome, $num_reuniao, $ano_reuniao, $tipo);
-    $InUse = $this->model->getInUse();
-
-    $busca_n = 1;
-    $reuniao = $this->model->getReuniao();
-    $reuniao = array_values(get_object_vars($reuniao[0]));
-
-    $cur_ano_reuniao = $reuniao[1];
-    $cur_num_reuniao = $reuniao[0];
-
-    $Informes = $this->model->getInformes($cur_num_reuniao, $cur_ano_reuniao);
-
-    require APP . 'view/_templates/header.php';
-    require APP . 'view/solr/schedule.php';
-    require APP . 'view/_templates/footer.php';
-
-    // Cache dump
-    //header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-    //header("Cache-Control: post-check=0, pre-check=0", false);
-    //header("Pragma: no-cache");
-  }
 
   public function geraDoc(){
-    var_dump($_POST);
+    // where to go after file has been added
+    header('location: ' . URL . 'solr/schedule');
+
+    // Cache dump
+    header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+    header("Cache-Control: post-check=0, pre-check=0", false);
+    header("Pragma: no-cache");
+
+    echo "OLA";
   }
 
 
@@ -425,6 +436,8 @@ class Solr extends Controller
      */
     public function enviarArquivo()
     {
+
+        var_dump($_FILES);
         // if we have POST data
         if (isset($_POST["submit_add_file"])) {
             date_default_timezone_set('America/Sao_Paulo');
