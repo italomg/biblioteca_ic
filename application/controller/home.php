@@ -76,7 +76,8 @@ if(ldap_bind($ldap_con,$ldap_user,$pass) && ($permitir == "allow")){
     	 */
     	
     	//autenticacao dummy enquanto nao passarmos pra intra do IC
-    	if (($user != "funcionario" && $passwd != "funcionario123") ) {
+    	if (($user != "funcionario" && $passwd != "funcionario123") &&
+    		!isset($_SESSION['login']) ) {
     		require APP . 'view/_templates/header.php';
     		require APP . 'view/home/login.php';
     		require APP . 'view/_templates/footer.php';
