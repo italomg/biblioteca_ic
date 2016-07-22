@@ -55,5 +55,5 @@ define('DB_TYPE', 'mysql');
 define('DB_HOST', '127.0.0.1');
 define('DB_NAME', 'pautas');
 define('DB_USER', 'bib');
-define('DB_PASS', 'bib123');
+define('DB_PASS', 'Bibl!234');
 define('DB_CHARSET', 'utf8');

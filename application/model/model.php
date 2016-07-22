@@ -66,7 +66,7 @@ class Model
     public function set_available($name, $num_reuniao, $ano_reuniao){
 
       $name = str_replace(' ', '', $name);
-      $sql = "UPDATE itens SET in_use=False WHERE short_name = :name AND num_reuniao = :num_reuniao AND ano_reuniao = :ano_reuniao";
+      $sql = "UPDATE itens SET in_use=False WHERE name = :name AND num_reuniao = :num_reuniao AND ano_reuniao = :ano_reuniao";
       $query = $this->db->prepare($sql);
       $parameters = array(':name' => $name, ':num_reuniao' => $num_reuniao, ':ano_reuniao' => $ano_reuniao);
 
@@ -76,7 +76,7 @@ class Model
     public function set_inUse($name, $num_reuniao, $ano_reuniao){
 
       $name = str_replace(' ', '', $name);
-      $sql = "UPDATE itens SET in_use=True WHERE short_name = :name AND num_reuniao = :num_reuniao AND ano_reuniao = :ano_reuniao";
+      $sql = "UPDATE itens SET in_use=True WHERE name = :name AND num_reuniao = :num_reuniao AND ano_reuniao = :ano_reuniao";
       $query = $this->db->prepare($sql);
       $parameters = array(':name' => $name, ':num_reuniao' => $num_reuniao, ':ano_reuniao' => $ano_reuniao);
 
@@ -115,7 +115,7 @@ class Model
       $num_str = "num_reuniao = :num_reuniao ";
       $and_str = "AND ";
       $ano_str = "ano_reuniao = :ano_reuniao ";
-      $name_str = "short_name LIKE :name ";
+      $name_str = "name LIKE :name ";
       $tipo_str = "tipo = :tipo ";
 
       if($name != ''){
@@ -154,6 +154,63 @@ class Model
 
       return $query->fetchAll();
     }
+
+    public function get_item($name, $num_reuniao, $ano_reuniao){
+
+      $sql = "SELECT * FROM itens WHERE name = :name AND num_reuniao = :num_reuniao AND ano_reuniao = :ano_reuniao";
+      $query = $this->db->prepare($sql);
+      $parameters = array(':name' => $name, ':num_reuniao' => $num_reuniao, ':ano_reuniao' => $ano_reuniao);
+
+      $query->execute($parameters);
+      return $query->fetchAll();
+    }
+
+    public function get_attachs($name, $num_reuniao, $ano_reuniao){
+
+      $sql = "SELECT * FROM attachments WHERE item_name = :name AND num_reuniao = :num_reuniao AND ano_reuniao = :ano_reuniao";
+      $query = $this->db->prepare($sql);
+      $parameters = array(':name' => $name, ':num_reuniao' => $num_reuniao, ':ano_reuniao' => $ano_reuniao);
+
+      $query->execute($parameters);
+      return $query->fetchAll();
+    }
+
+    public function remove_attach($item_name, $num_reuniao, $ano_reuniao, $file_name){
+
+      $sql = "DELETE FROM attachments WHERE item_name = :name AND num_reuniao = :num_reuniao AND ano_reuniao = :ano_reuniao AND file_name = :file_name";
+      $query = $this->db->prepare($sql);
+      $parameters = array(':name' => $item_name, ':num_reuniao' => $num_reuniao, ':ano_reuniao' => $ano_reuniao, ':file_name' => $file_name);
+
+      $query->execute($parameters);
+      return $query->rowCount();
+    }
+
+    public function update_item($name, $num_reuniao, $ano_reuniao, $tipo, $num_seq, $ano_seq, $suplementar, $files, $descricao){
+      //$sql = "INSERT INTO itens VALUES (:name, NOW(), :num_reuniao, :ano_reuniao, :num_seq, :ano_seq, :tipo, :descricao, false, :suplementar, true)";
+      
+      $sql = "";
+      if($suplementar == "sim"){
+        $sql = "UPDATE itens SET date = NOW(), seq_num = :num_seq, seq_ano = :ano_seq, tipo = :tipo, descricao = :descricao, in_use = false, suplementar = true, latest = true WHERE name = :name AND num_reuniao = :num_reuniao AND ano_reuniao = :ano_reuniao";
+      }
+      else{
+        $sql = "UPDATE itens SET date = NOW(), seq_num = :num_seq, seq_ano = :ano_seq, tipo = :tipo, descricao = :descricao, in_use = false, suplementar = false, latest = true WHERE name = :name AND num_reuniao = :num_reuniao AND ano_reuniao = :ano_reuniao";
+      }
+      $query = $this->db->prepare($sql);
+      $parameters = array(':name' => $name, ':num_reuniao' => $num_reuniao, ':ano_reuniao' => $ano_reuniao, ':num_seq' => $num_seq, ':ano_seq' => $ano_seq, ':tipo' => $tipo, ':descricao' => $descricao);
+      $query->execute($parameters);
+
+
+      foreach ($files as $file) {
+        echo $file;
+        $sqlf = "INSERT INTO attachments VALUES (:item_name, :num_reuniao, :ano_reuniao, :file_name)";
+        $queryf = $this->db->prepare($sqlf);
+        $parametersf = array(':item_name' => $name, ':num_reuniao' => $num_reuniao, ':ano_reuniao' => $ano_reuniao, ':file_name' => $file);
+        $queryf->execute($parametersf);
+      }
+    
+
+    return $query->rowCount(); 
+  }
 
     /**
      * Get all songs from database

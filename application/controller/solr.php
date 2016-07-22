@@ -87,6 +87,46 @@ class Solr extends Controller
     require APP . 'view/_templates/footer.php';
   }
 
+  public function get_item_info(){
+
+    $aResult = '';
+
+    if(!isset($_POST['arguments']) || (count($_POST['arguments']) != 3)){
+       $aResult = 'Argumentos invalidos!';
+    }
+
+    $name = $_POST['arguments'][0];
+    $num_reuniao = $_POST['arguments'][1];
+    $ano_reuniao = $_POST['arguments'][2];
+
+    $item_info = $this->model->get_item($name, $num_reuniao, $ano_reuniao);
+    $item_attachs = $this->model->get_attachs($name, $num_reuniao, $ano_reuniao);
+
+    //var_dump($item_attachs);
+
+    echo json_encode(array('item_info' => $item_info, 'item_attachs' => $item_attachs));
+
+  }
+
+  public function remove_attach(){
+    $aResult = '';
+
+    if(!isset($_POST['arguments']) || (count($_POST['arguments']) != 4)){
+       $aResult = 'Argumentos invalidos!';
+    }
+
+    $item_name = $_POST['arguments'][0];
+    $num_reuniao = $_POST['arguments'][1];
+    $ano_reuniao = $_POST['arguments'][2];
+    $file_name = $_POST['arguments'][3];
+
+    $item_info = $this->model->remove_attach($item_name, $num_reuniao, $ano_reuniao, $file_name);
+    if($item_info == 0)
+      echo "ERROR";
+    else
+      echo "OK";
+  }
+
   public function set_handler(){
 
     $aResult = '';
@@ -157,6 +197,69 @@ class Solr extends Controller
 
     echo json_encode($aResult);
     echo json_encode($rowMod);
+  }
+
+  public function salvaItem(){
+    var_dump($_POST);
+
+    $name = $_POST["nome"];
+    unset($_POST["nome"]);
+
+    $num_reuniao = $_POST["num_reuniao"];
+    unset($_POST["num_reuniao"]);
+
+    $ano_reuniao = $_POST["ano_reuniao"];
+    unset($_POST["ano_reuniao"]);
+
+    $tipo = $_POST["tipo"];
+    unset($_POST["tipo"]);
+
+    $num_seq = $_POST["num_seq"];
+    unset($_POST["num_seq"]);
+
+    $ano_seq = $_POST["ano_seq"];
+    unset($_POST["ano_seq"]);
+
+    if(isset($_POST["suplemetar"])){
+      $suplemetar = $_POST["suplemetar"];
+      unset($_POST["suplemetar"]);
+    } else{
+      $suplemetar = "nao";
+    }
+
+    $descricao = $_POST["descricao"];
+    unset($_POST["descricao"]);
+
+    $files = array();
+    foreach($_FILES as $file){
+      $files[] = basename($file['name']);
+    }
+
+    /*if (count($_FILES) > 0) {
+
+
+      foreach($_FILES as $file){
+        $fname = basename($file['name']);
+
+
+        if ($file['error'] == 0) {
+
+          $upload_dir = 'tmp';
+
+          if (!file_exists($upload_dir)) {
+            mkdir($upload_dir, 0755, true);
+          }
+
+          $target_file = $upload_dir . '/' . basename($file['name']);
+
+          if (!move_uploaded_file($file["tmp_name"], $target_file) ) {
+            return null;
+          }
+        }
+      }
+    }*/
+
+   $this->model->update_item($name, $num_reuniao, $ano_reuniao, $tipo, $num_seq, $ano_seq, $suplemetar, $files, $descricao);
   }
 
 
