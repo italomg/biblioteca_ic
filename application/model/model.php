@@ -1,10 +1,5 @@
 <?php
 
-/*
-    ==== Everything below is sample code!!! ====
-    USE THIS ONLY IF YOU NEED A DATABASE CONNECTION!
-*/
-
 class Model
 {
     /**

@@ -15,7 +15,7 @@
                       <li><a href="<?php echo URL; ?>solr/listar">Listar Todos</a></li>
                       <li><a href="<?php echo URL; ?>solr/listar_categoria">Listar Categoria/Ano</a></li>
                       <li class="current"><a href="<?php echo URL; ?>solr/contato">Contato</a></li>
-                      <li><a href="<?php echo URL; ?>solr/schedule">Criar Pauta</a></li>                      
+                      <li><a href="<?php echo URL; ?>solr/schedule">Criar Pauta</a></li>               
                       <div class="clear"></div>
                     </ul>
                     <script type="text/javascript" src="web/js/responsive-nav.js"></script>
