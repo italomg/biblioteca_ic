@@ -7,11 +7,11 @@ class Model
      */
     function __construct($db)
     {
-        try {
-            $this->db = $db;
-        } catch (PDOException $e) {
-            exit('Database connection could not be established.');
-        }
+      try {
+        $this->db = $db;
+      } catch (PDOException $e) {
+        exit('Database connection could not be established.');
+      }
     }
 
     public function getInformes($num_reuniao, $ano_reuniao){
@@ -49,12 +49,22 @@ class Model
       return $query->fetchAll();
     }
 
-    public function getReuniao(){
+    public function get_ultima_reuniao(){
 
-      $sql = "SELECT max(num_reuniao), max(ano_reuniao) FROM itens";
+      $sql = "SELECT max(num), max(ano) FROM reunioes";
       $query = $this->db->prepare($sql);
 
       $query->execute();
+      return $query->fetchAll();
+    }
+
+    public function get_reuniao($num_reuniao, $ano_reuniao){
+
+      $sql = "SELECT * FROM reunioes WHERE num = :num_reuniao AND ano = :ano_reuniao";
+      $query = $this->db->prepare($sql);
+      $parameters = array(':num_reuniao' => $num_reuniao, ':ano_reuniao' => $ano_reuniao);
+
+      $query->execute($parameters);
       return $query->fetchAll();
     }
 
@@ -118,12 +128,12 @@ class Model
         $sql = $sql . $name_str;
       }
       if($num_reuniao > 0){
-          $sql = $sql . $and_str;
-          $sql = $sql . $num_str;
+        $sql = $sql . $and_str;
+        $sql = $sql . $num_str;
       }
       if($ano_reuniao > 0){
-          $sql = $sql . $and_str;
-          $sql = $sql . $num_str;
+        $sql = $sql . $and_str;
+        $sql = $sql . $num_str;
       }
       if($tipo != ''){
         $sql = $sql . $and_str;
@@ -182,7 +192,7 @@ class Model
 
     public function update_item($name, $num_reuniao, $ano_reuniao, $tipo, $num_seq, $ano_seq, $suplementar, $files, $descricao){
       //$sql = "INSERT INTO itens VALUES (:name, NOW(), :num_reuniao, :ano_reuniao, :num_seq, :ano_seq, :tipo, :descricao, false, :suplementar, true)";
-      
+
       $sql = "";
       if($suplementar == "sim"){
         $sql = "UPDATE itens SET date = NOW(), seq_num = :num_seq, seq_ano = :ano_seq, tipo = :tipo, descricao = :descricao, in_use = false, suplementar = true, latest = true WHERE name = :name AND num_reuniao = :num_reuniao AND ano_reuniao = :ano_reuniao";
@@ -195,32 +205,76 @@ class Model
       $query->execute($parameters);
 
 
-      foreach ($files as $file) {
-        echo $file;
-        $sqlf = "INSERT INTO attachments VALUES (:item_name, :num_reuniao, :ano_reuniao, :file_name)";
-        $queryf = $this->db->prepare($sqlf);
-        $parametersf = array(':item_name' => $name, ':num_reuniao' => $num_reuniao, ':ano_reuniao' => $ano_reuniao, ':file_name' => $file);
-        $queryf->execute($parametersf);
-      }
-    
 
-    return $query->rowCount(); 
-  }
+      $tot_count = $query->rowCount();
+      if($tot_count > 0){
+        foreach ($files as $file) {
+          $sqlf = "INSERT INTO attachments VALUES (:item_name, :num_reuniao, :ano_reuniao, :file_name)";
+          $queryf = $this->db->prepare($sqlf);
+          $parametersf = array(':item_name' => $name, ':num_reuniao' => $num_reuniao, ':ano_reuniao' => $ano_reuniao, ':file_name' => $file);
+          $queryf->execute($parametersf);
+        }
+      }
+
+
+      return $query->rowCount(); 
+    }
+
+    public function item_exist($name, $num_reuniao, $ano_reuniao){
+      $sql = "SELECT * FROM itens WHERE name = :name AND num_reuniao = :num_reuniao AND ano_reuniao = :ano_reuniao LIMIT 1";
+      $query = $this->db->prepare($sql);
+      $parameters = array(':name' => $name, ':num_reuniao' => $num_reuniao, ':ano_reuniao' => $ano_reuniao);
+      $query->execute($parameters);
+      if($query->rowCount() > 0)
+        return true;
+      else
+        return false;
+    }
+
+    public function insert_item($name, $num_reuniao, $ano_reuniao, $tipo, $num_seq, $ano_seq, $suplementar, $files, $descricao){
+      //$sql = "INSERT INTO itens VALUES (:name, NOW(), :num_reuniao, :ano_reuniao, :num_seq, :ano_seq, :tipo, :descricao, false, :suplementar, true)";
+      
+      $sql = "";
+      if($suplementar == "sim"){
+        $sql = "INSERT INTO itens values(:name, NOW(), :num_reuniao, :ano_reuniao, :num_seq, :ano_seq, :tipo, :descricao, false, true, true)";
+      }
+      else{
+        $sql = "INSERT INTO itens values(:name, NOW(), :num_reuniao, :ano_reuniao, :num_seq, :ano_seq, :tipo, :descricao, false, false, true)";
+      }
+      $query = $this->db->prepare($sql);
+
+
+      $parameters = array(':name' => $name, ':num_reuniao' => $num_reuniao, ':ano_reuniao' => $ano_reuniao, ':num_seq' => $num_seq, ':ano_seq' => $ano_seq, ':tipo' => $tipo, ':descricao' => $descricao);
+      $query->execute($parameters);
+
+      $tot_count = $query->rowCount();
+      if($tot_count > 0){
+        foreach ($files as $file) {
+          $sqlf = "INSERT INTO attachments VALUES (:item_name, :num_reuniao, :ano_reuniao, :file_name)";
+          $queryf = $this->db->prepare($sqlf);
+          $parametersf = array(':item_name' => $name, ':num_reuniao' => $num_reuniao, ':ano_reuniao' => $ano_reuniao, ':file_name' => $file);
+          $queryf->execute($parametersf);
+        }
+      }
+      
+
+      return $query->rowCount(); 
+    }
 
     /**
      * Get all songs from database
      */
     public function getAllSongs()
     {
-        $sql = "SELECT id, artist, track, link FROM song";
-        $query = $this->db->prepare($sql);
-        $query->execute();
+      $sql = "SELECT id, artist, track, link FROM song";
+      $query = $this->db->prepare($sql);
+      $query->execute();
 
         // fetchAll() is the PDO method that gets all result rows, here in object-style because we defined this in
         // core/controller.php! If you prefer to get an associative array as the result, then do
         // $query->fetchAll(PDO::FETCH_ASSOC); or change core/controller.php's PDO options to
         // $options = array(PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC ...
-        return $query->fetchAll();
+      return $query->fetchAll();
     }
 
     /**
@@ -235,14 +289,14 @@ class Model
      */
     public function addSong($artist, $track, $link)
     {
-        $sql = "INSERT INTO song (artist, track, link) VALUES (:artist, :track, :link)";
-        $query = $this->db->prepare($sql);
-        $parameters = array(':artist' => $artist, ':track' => $track, ':link' => $link);
+      $sql = "INSERT INTO song (artist, track, link) VALUES (:artist, :track, :link)";
+      $query = $this->db->prepare($sql);
+      $parameters = array(':artist' => $artist, ':track' => $track, ':link' => $link);
 
         // useful for debugging: you can see the SQL behind above construction by using:
         // echo '[ PDO DEBUG ]: ' . Helper::debugPDO($sql, $parameters);  exit();
 
-        $query->execute($parameters);
+      $query->execute($parameters);
     }
 
     /**
@@ -253,14 +307,14 @@ class Model
      */
     public function deleteSong($song_id)
     {
-        $sql = "DELETE FROM song WHERE id = :song_id";
-        $query = $this->db->prepare($sql);
-        $parameters = array(':song_id' => $song_id);
+      $sql = "DELETE FROM song WHERE id = :song_id";
+      $query = $this->db->prepare($sql);
+      $parameters = array(':song_id' => $song_id);
 
         // useful for debugging: you can see the SQL behind above construction by using:
         // echo '[ PDO DEBUG ]: ' . Helper::debugPDO($sql, $parameters);  exit();
 
-        $query->execute($parameters);
+      $query->execute($parameters);
     }
 
     /**
@@ -268,17 +322,17 @@ class Model
      */
     public function getSong($song_id)
     {
-        $sql = "SELECT id, artist, track, link FROM song WHERE id = :song_id LIMIT 1";
-        $query = $this->db->prepare($sql);
-        $parameters = array(':song_id' => $song_id);
+      $sql = "SELECT id, artist, track, link FROM song WHERE id = :song_id LIMIT 1";
+      $query = $this->db->prepare($sql);
+      $parameters = array(':song_id' => $song_id);
 
         // useful for debugging: you can see the SQL behind above construction by using:
         // echo '[ PDO DEBUG ]: ' . Helper::debugPDO($sql, $parameters);  exit();
 
-        $query->execute($parameters);
+      $query->execute($parameters);
 
         // fetch() is the PDO method that get exactly one result
-        return $query->fetch();
+      return $query->fetch();
     }
 
     /**
@@ -294,14 +348,14 @@ class Model
      */
     public function updateSong($artist, $track, $link, $song_id)
     {
-        $sql = "UPDATE song SET artist = :artist, track = :track, link = :link WHERE id = :song_id";
-        $query = $this->db->prepare($sql);
-        $parameters = array(':artist' => $artist, ':track' => $track, ':link' => $link, ':song_id' => $song_id);
+      $sql = "UPDATE song SET artist = :artist, track = :track, link = :link WHERE id = :song_id";
+      $query = $this->db->prepare($sql);
+      $parameters = array(':artist' => $artist, ':track' => $track, ':link' => $link, ':song_id' => $song_id);
 
         // useful for debugging: you can see the SQL behind above construction by using:
         // echo '[ PDO DEBUG ]: ' . Helper::debugPDO($sql, $parameters);  exit();
 
-        $query->execute($parameters);
+      $query->execute($parameters);
     }
 
     /**
@@ -310,11 +364,11 @@ class Model
      */
     public function getAmountOfSongs()
     {
-        $sql = "SELECT COUNT(id) AS amount_of_songs FROM song";
-        $query = $this->db->prepare($sql);
-        $query->execute();
+      $sql = "SELECT COUNT(id) AS amount_of_songs FROM song";
+      $query = $this->db->prepare($sql);
+      $query->execute();
 
         // fetch() is the PDO method that get exactly one result
-        return $query->fetch()->amount_of_songs;
+      return $query->fetch()->amount_of_songs;
     }
-}
+  }

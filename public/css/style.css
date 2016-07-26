@@ -2017,13 +2017,15 @@ ul.item_ul{
 	margin-right: 10px;
 }
 
-ul#item_info_file_list
+ul#item_info_file_list,
+ul#insere_item_file_list
 {
   text-align: left; 
   list-style-type: none;
 }
 
-ul#item_info_file_list li
+ul#item_info_file_list li,
+ul#insere_item_file_list li
 {
     float: left; 
     display: inline;     

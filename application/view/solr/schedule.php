@@ -115,7 +115,7 @@
             amount++;
             i++;
           }
-          this_elem.prop('readonly', true);
+          this_elem.prop('disabled', true);
           document.getElementById(pre).readOnly = true;
         }
       });
@@ -150,7 +150,7 @@
         if(data.split("\"")[2] >= 1){
           $.toaster({ message : data.split("\"")[1], priority: 'info' });
           document.getElementById('informes_input').value = "";
-          $('#informes_add').prop('readonly', false);
+          $('#informes_add').prop('disabled', false);
           document.getElementById("informes_input").readOnly = false;
         }
       });
@@ -180,15 +180,15 @@
 
     function donothing(elem){
       if(dbclk == 0){
-        //console.log(elem.innerHTML.split(" "));
-        splited = elem.innerHTML.split(" ");
-        name = splited[1];
-        num_reuniao = splited[3].split("/")[0];
-        ano_reuniao = splited[3].split("/")[1];
+        //console.log(elem.innerHTML.split(/\s{4}/));
+        splited = elem.innerHTML.split(/\s{4}/);
+        name = splited[0].trim();
+        num_reuniao = splited[1].split("/")[0];
+        ano_reuniao = splited[1].split("/")[1];
 
         jQuery.post("<?php echo URL; ?>solr/get_item_info", {arguments: [name, num_reuniao, ano_reuniao]}, function(data){
-          //console.log(data);
           data = JSON.parse(data);
+          console.log(data);
           $("#item_info_nome").val(data.item_info[0].name);
           $("#item_info_"+data.item_info[0].tipo).attr("selected", "");
           if(data.item_info[0].suplementar == "0")
@@ -196,17 +196,20 @@
           else
             $("#squaredOne").attr("checked", true);
 
-          $("#item_info_reuniao_num").val(num_reuniao);
-          $("#item_info_reuniao_ano").val(ano_reuniao);
+          var no = 1;
+          var tipo_reuniao = "Extraordinária";
+          var data_reuniao = "01/12/2014";
+
+          $("#item_info_reuniao").html(num_reuniao +'/'+ ano_reuniao +'&emsp;'+ no + '&ordf; Reunião ' + tipo_reuniao + ' --- ' + data_reuniao);
 
           //TODO implementar os numeros de sequencia
           $("#item_info_seq_num").val(num_reuniao);
           $("#item_info_seq_ano").val(ano_reuniao);
 
+
           item_info_data = data.item_info[0].date.split(" ")[0].split('-');
-          $("#item_info_dia").val(item_info_data[2]);
-          $("#item_info_mes").val(item_info_data[1]);
-          $("#item_info_ano").val(item_info_data[0]);
+          $("#item_info_datahora").html(item_info_data[2] +'/'+ item_info_data[1] +'/'+ item_info_data[0] + '&emsp; - &emsp;' + data.item_info[0].date.split(" ")[1]);
+
 
           $("#item_info_descricao").text(data.item_info[0].descricao);
 
@@ -245,7 +248,6 @@
     });
 
 
-
     $(document).on('click','.item_info_rmv_file', function(){
       var liprev = $(this).parent().parent();
       var licur = $(this).parent().parent().prev();
@@ -261,18 +263,18 @@
       } else{
         $('input[name="'+ filename +'"]').remove();
       }
-      console.log($('input[name="'+ filename +'"]').length);
+      //console.log($('input[name="'+ filename +'"]').length);
       //console.log(licur.text().trim());
     });
 
   });
 /* Reacao pra click e double_click FIM*/
 
-function addNewFile(elem){
+function addNewFile(elem, clearfixid){
   var filename = $(elem).val().replace(/^.*[\\\/]/, '');
   $(elem).hide();
   $(elem).attr("name", filename);
-  $('<input class="form-control" type="file" value="" onchange="if(validateSingleInput2(this)) addNewFile(this);" style="margin-bottom: 2%;" />').insertAfter($(elem));
+  $('<input class="form-control" type="file" value="" onchange="if(validateSingleInput2(this)) addNewFile(this,\''+clearfixid+'\');" style="margin-bottom: 2%;" />').insertAfter($(elem));
   $('<li class="item_info_file" style="width: 85%;"> <img src="<?php echo URL; ?>images/pdf-icon.gif" alt="image"/> &emsp; ' + filename + '</li>\
     <li style="display: inline; margin-top:8px; margin-left: 5px;">\
       <span class="input-group-btn" style="display: inline;">\
@@ -280,7 +282,51 @@ function addNewFile(elem){
           <span class="glyphicon glyphicon-trash"></span>\
         </button>\
       </span>\
-    </li>').insertBefore("#file_clearfix");   
+    </li>').insertBefore(clearfixid);   
+}
+
+function addItem(){
+
+  ano_reuniao = Number("<?php echo $cur_ano_reuniao?>");
+  num_reuniao = Number("<?php echo $cur_num_reuniao?>");
+
+  $('#insere_item_form')[0].reset();
+  //FILES
+  $("#insere_item_file_list").empty();
+  $("#insere_item_file_list").append('<div id="insere_file_clearfix" class="clearfix"></div>');
+
+  jQuery.post("<?php echo URL; ?>solr/get_reuniao_info", {arguments: [num_reuniao, ano_reuniao]}, function(data){
+    console.log(data);
+    data = JSON.parse(data);
+  });
+
+  var no = 1;
+  var tipo_reuniao = "Extraordinária";
+  var data_reuniao = "01/12/2014";
+
+  $("#insere_item_reuniao").html(num_reuniao +'/'+ ano_reuniao +'&emsp;'+ no + '&ordf; Reunião ' + tipo_reuniao + ' --- ' + data_reuniao);
+  $("#insere_item_ano_reuniao").val(ano_reuniao);
+  $("#insere_item_num_reuniao").val(num_reuniao);
+
+  $("#insere_item_modal").modal();
+}
+
+function copyItem(){
+
+  ano_reuniao = Number("<?php echo $cur_ano_reuniao?>");
+  num_reuniao = Number("<?php echo $cur_num_reuniao?>");
+
+  $('#insere_item_form')[0].reset();
+  //FILES
+  $("#insere_item_file_list").empty();
+  $("#insere_item_file_list").append('<div id="insere_file_clearfix" class="clearfix"></div>');
+
+  jQuery.post("<?php echo URL; ?>solr/get_reuniao_info", {arguments: [num_reuniao, ano_reuniao]}, function(data){
+    console.log(data);
+    data = JSON.parse(data);
+  });
+
+  $("#insere_item_modal").modal();
 }
 
 
@@ -294,33 +340,33 @@ function addNewFile(elem){
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title">Informacoes do Item</h4>
+        <h4 class="modal-title" style="font-weight: bold;">Informações do Item</h4>
       </div>
       <div class="modal-body" style="background: #637f83;">
 
         <form id="item_info_form" class="busca-avancada" action="<?php echo URL; ?>solr/salvaItem" method="POST" style="height: 100%;" enctype="multipart/form-data">
-          <div class="col-md-2" style="height: 80%;">
+          <div class="col-md-2" style="height: 80%; display: none;">
             <ul id="historico" class="twitter img-rounded" style="padding-bottom: 4em; height: 100%;">
-              <label style="color: white;">Historico de Alteracoes:</label>
+              <label style="color: white; font-size: large; font-style: italic;">Histórico de Alterações:</label>
             </ul>
           </div>
-          <div class="col-md-5" style="height: 100%;">
+          <div class="col-md-5" style="height: 100%; margin-left: 8%;">
             <div class="form-group" style="border-bottom: 1px solid #597275; padding-bottom: 2%;">
-              <label> Nome: </label>
+              <label style="font-size: large; font-style: italic;"> Nome: </label>
               <input id="item_info_nome" class="form-control" type="text" name="nome" value="" />
             </div>
             <div class="form-group" style="border-bottom: 1px solid #597275; padding-bottom: 2%;">
-              <label> Tipo: </label>
+              <label style="font-size: large; font-style: italic;"> Tipo: </label>
               <select class="form-control" name="tipo">
-                <option value="">Qualquer</option>
+                <option value="">Outro</option>
                 <option id="item_info_exp" value="exp">Expediente</option>
-                <option id="item_info_ciencia" value="ciencia">Ciencia</option>
+                <option id="item_info_ciencia" value="ciencia">Ciência</option>
                 <option id="item_info_odia" value="odia">Ordem do Dia</option>
-                <option id="item_info_homo" value="homo">Homologacao</option>
+                <option id="item_info_homo" value="homo">Homologação</option>
               </select>
             </div>
             <div class="form-group row" style="border-bottom: 1px solid #597275; padding-bottom: 2%;">
-              <label class="col-md-6" style="margin-top: 0.3%; width: 40%">Adicionado a pauta suplementar:</label>
+              <label class="col-md-6" style="margin-top: 0.3%; width: 40% font-size: large; font-style: italic;">Pertence à pauta suplementar:</label>
               <div class="squaredOne col-md-3" style="margin: 0px;">
                 <input type="checkbox" value="sim" id="squaredOne" name="suplementar" />
                 <label for="squaredOne"></label>
@@ -330,76 +376,171 @@ function addNewFile(elem){
 
             <div class="form-group" style="border-bottom: 1px solid #597275; padding-bottom: 2%;">
               <div class="row" style="padding-left: 0.8em;">
-                <label> Reuniao: </label>
+                <label style="font-size: large; font-style: italic;"> Reunião: </label>
               </div>
               <div class="row">
+               <label  id="item_info_reuniao" style="padding-left: 2em; font-weight: normal; font-size: larger;"> </label>
+             </div>
+           </div>
+           <div class="form-group" style="border-bottom: 1px solid #597275; padding-bottom: 2%;">
+            <div class="row" style="padding-left: 0.8em;">
+              <label style="font-size: large; font-style: italic;"> Numero de Sequência: </label>
+            </div>
+            <div class="row">
+              <div class="col-md-2" style="width: 4.5em;">
+                <input id="item_info_seq_num" class="form-control" type="number" name="num_seq" value="" style="width: 100%;font-size: 1em;" max="31" min="1" />
+              </div>
+              <h1 class="col-md-1" style="color: white; padding: 0px; margin-top: 0.07em; width: 0.4em;">/</h1>
+              <div class="col-md-4" style="width: 5.5em;">
+                <input id="item_info_seq_ano" class="form-control" type="number" name="ano_seq" value="" style="width: 100%; font-size: 1em;" max="2100" min="2014"/>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label style="font-size: large; font-style: italic;">Arquivos Anexados: </label>
+            <ul id="item_info_file_list" class="twitter img-rounded" style="background: #637f83; padding-left: 0px;">
+
+              <div id="file_clearfix" class="clearfix"></div>
+            </ul> 
+            <input class="form-control" type="file" value="" onchange="if(validateSingleInput2(this)) addNewFile(this, '#file_clearfix');" style="margin-bottom: 2%;" />
+          </div>
+
+        </div>
+        <div class="col-md-5" style="height: 100%;">
+          <div class="form-group" style="border-bottom: 1px solid #597275; padding-bottom: 2%;">
+            <div class="row" style="padding-left: 0.8em;">
+              <label style="font-size: large; font-style: italic;"> Data e Hora da última alteração: </label>
+            </div>
+            <div class="row">
+              <label  id="item_info_datahora" style="padding-left: 2em; font-weight: normal; font-size: larger;"> </label>
+            </div>
+          </div>
+          <div class="form-group" style="height: 70%;">
+            <label style="font-size: large; font-style: italic;"> Descrição: </label>
+            <textarea id="item_info_descricao" name="descricao" value="" cols="0" rows="5" class="descricao_textarea"></textarea>
+          </div>
+        </div>
+
+        <input type="hidden" name="num_reuniao" value="<?php echo $cur_num_reuniao; ?>">
+        <input type="hidden" name="ano_reuniao" value="<?php echo $cur_ano_reuniao; ?>">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary item_info_btn" style="float: left;">Gerar Deliberação</button>
+        <button type="button" class="btn btn-primary item_info_btn" style="float: left;">Gerar Homologação</button>
+        <button type="button" class="btn btn-primary item_info_btn" style="float: left;">Gerar Informação</button>
+        <button type="button" id="item_info_copy" class="btn btn-primary item_info_btn" style="float: left;">Gerar Item a partir deste</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal" style="padding: 12px; font-size: 0.8125em;">Fechar</button>
+        <input type="submit" class="btn btn-primary item_info_btn" name="envia" value="Salvar">
+      </div>
+    </form>
+  </div><!-- /.modal-content -->
+</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div id="insere_item_modal" class="modal modal-wide fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" style="font-weight: bold;">Novo Item</h4>
+      </div>
+      <div class="modal-body" style="background: #637f83;">
+
+        <form id="insere_item_form" class="busca-avancada" action="<?php echo URL; ?>solr/salvaItem" method="POST" style="height: 100%;" enctype="multipart/form-data">
+          <div class="col-md-2" style="height: 80%; display: none;">
+            <ul id="insere_item_historico" class="twitter img-rounded" style="padding-bottom: 4em; height: 100%;">
+              <label style="color: white;">Histórico de Alterações:</label>
+            </ul>
+          </div>
+          <div class="col-md-5" style="height: 100%; margin-left: 8%;">
+            <div class="form-group" style="border-bottom: 1px solid #597275; padding-bottom: 2%;">
+              <label style="font-size: large; font-style: italic;"> Nome: </label>
+              <input id="insere_item_nome" class="form-control" type="text" name="nome" value="" placeholder="Descrever de forma simples qual o assunto deste Item" />
+            </div>
+            <div class="form-group" style="border-bottom: 1px solid #597275; padding-bottom: 2%;">
+              <label style="font-size: large; font-style: italic;"> Tipo: </label>
+              <select class="form-control" name="tipo">
+                <option value="">Outro</option>
+                <option id="insere_item_exp" value="exp">Expediente</option>
+                <option id="insere_item_ciencia" value="ciencia">Ciência</option>
+                <option id="insere_item_odia" value="odia">Ordem do Dia</option>
+                <option id="insere_item_homo" value="homo">Homologação</option>
+              </select>
+            </div>
+            <div class="form-group row" style="border-bottom: 1px solid #597275; padding-bottom: 2%;">
+              <label class="col-md-6" style="margin-top: 0.3%; width: 40%; font-size: large; font-style: italic;">Pertence à pauta suplementar:</label>
+              <div class="squaredOne col-md-3" style="margin: 0px; margin-top: 0.5%;">
+                <input type="checkbox" value="sim" id="insere_item_squaredOne" name="suplementar" />
+                <label for="insere_item_squaredOne"></label>
+              </div>
+
+            </div>
+
+            <div class="form-group" style="border-bottom: 1px solid #597275; padding-bottom: 2%;">
+              <div class="row" style="padding-left: 0.8em;">
+                <label style="font-size: large; font-style: italic; margin-bottom: 2%;"> Dados da Reunião: </label>
+              </div>
+              <div class="row">
+                <label style="margin-top: 1%; font-weight: normal; font-size: large; float: left; padding-left: 2%;"> N&ordm; de Referência:  </label>
                 <div class="col-md-2" style="width: 4.5em;">
-                  <input id="item_info_reuniao_num" class="form-control" type="number" name="num_reuniao" value="" style="width: 100%;font-size: 1em;" max="31" min="1" readonly/>
+                  <input id="insere_item_num_reuniao" class="form-control" type="number" name="num_reuniao" value="" style="width: 100%;font-size: 1em;" max="31" min="1" placeholder="<?php echo $cur_num_reuniao; ?>" />
                 </div>
                 <h1 class="col-md-1" style="color: white; padding: 0px; margin-top: 0.07em; width: 0.4em;">/</h1>
                 <div class="col-md-4" style="width: 5.5em;">
-                  <input id="item_info_reuniao_ano" class="form-control" type="number" name="ano_reuniao" value="" style="width: 100%; font-size: 1em;" max="2100" min="2014" readonly/>
+                  <input id="insere_item_ano_reuniao" class="form-control" type="number" name="ano_reuniao" value="" style="width: 100%; font-size: 1em;" max="2100" min="2014" placeholder="<?php echo $cur_ano_reuniao; ?>"/>
                 </div>
+              </div>
+              <div class="row" style="margin-bottom: 1%;">
+                <label style="margin-top: 1%; font-weight: normal; font-size: large; float: left; padding-left: 2%; margin-right: 13%;"> N&ordm; de Referência da Reunião Atual:  </label>
+                <label  id="insere_item_reuniao" style="padding-left: 2em; font-weight: normal; font-size: larger; color: #4c4c4c;"> </label>
               </div>
             </div>
             <div class="form-group" style="border-bottom: 1px solid #597275; padding-bottom: 2%;">
               <div class="row" style="padding-left: 0.8em;">
-                <label> Numero de Sequencia: </label>
+                <label style="font-size: large; font-style: italic;"> Número de Sequência: </label>
               </div>
               <div class="row">
                 <div class="col-md-2" style="width: 4.5em;">
-                  <input id="item_info_seq_num" class="form-control" type="number" name="num_seq" value="" style="width: 100%;font-size: 1em;" max="31" min="1" />
+                  <input id="insere_item_seq_num" class="form-control" type="number" name="num_seq" value="" style="width: 100%;font-size: 1em;" max="31" min="1" readonly/>
                 </div>
                 <h1 class="col-md-1" style="color: white; padding: 0px; margin-top: 0.07em; width: 0.4em;">/</h1>
                 <div class="col-md-4" style="width: 5.5em;">
-                  <input id="item_info_seq_ano" class="form-control" type="number" name="ano_seq" value="" style="width: 100%; font-size: 1em;" max="2100" min="2014"/>
+                  <input id="insere_item_seq_ano" class="form-control" type="number" name="ano_seq" value="" style="width: 100%; font-size: 1em;" max="2100" min="2014" readonly/>
                 </div>
               </div>
             </div>
             <div class="form-group">
-              <label>Arquivos Anexados: </label>
-              <ul id="item_info_file_list" class="twitter img-rounded" style="background: #637f83; padding-left: 0px;">
+              <label style="font-size: large; font-style: italic;">Arquivos Anexados: </label>
+              <ul id="insere_item_file_list" class="twitter img-rounded" style="background: #637f83; padding-left: 0px;">
 
-                <div id="file_clearfix" class="clearfix"></div>
+                <div id="insere_file_clearfix" class="clearfix"></div>
               </ul> 
-              <input class="form-control" type="file" value="" onchange="if(validateSingleInput2(this)) addNewFile(this);" style="margin-bottom: 2%;" />
+              <input class="form-control" type="file" value="" onchange="if(validateSingleInput2(this)) addNewFile(this, '#insere_file_clearfix');" style="margin-bottom: 2%;" />
             </div>
 
           </div>
           <div class="col-md-5" style="height: 100%;">
             <div class="form-group" style="border-bottom: 1px solid #597275; padding-bottom: 2%;">
               <div class="row" style="padding-left: 0.8em;">
-                <label> Data: </label>
+                <label style="font-size: large; font-style: italic;"> Data e Hora da última alteração: </label>
               </div>
               <div class="row">
-                <div class="col-md-2" style="width: 4.5em;">
-                  <input id="item_info_dia" class="form-control" type="number" name="dia" value="" style="width: 100%;font-size: 1em;" max="31" min="1" disabled/>
-                </div>
-                <h1 class="col-md-1" style="color: white; padding: 0px; margin-top: 0.07em; width: 0.4em;">/</h1>
-                <div class="col-md-2" style="width: 4.5em;">
-                  <input id="item_info_mes" class="form-control" type="number" name="mes" value="" style="width: 100%;font-size: 1em;" max="31" min="1" disabled/>
-                </div>
-                <h1 class="col-md-1" style="color: white; padding: 0px; margin-top: 0.07em; width: 0.4em;">/</h1>
-                <div class="col-md-4" style="width: 5.5em;">
-                  <input id="item_info_ano" class="form-control" type="number" name="ano" value="" style="width: 100%; font-size: 1em;" max="2100" min="2014" disabled/>
-                </div>
+                <label  id="insere_item_datahora" style="padding-left: 2em; font-weight: normal; font-size: larger;"> </label>
               </div>
             </div>
             <div class="form-group" style="height: 70%;">
-              <label> Descricao: </label>
-              <textarea id="item_info_descricao" name="descricao" value="" cols="0" rows="5" class="descricao_textarea"></textarea>
+              <label style="font-size: large; font-style: italic;"> Descrição: </label>
+              <textarea id="insere_item_descricao" name="descricao" value="" cols="0" rows="5" class="descricao_textarea" placeholder="Descrever de forma detalhada sobre o que se trata este item."></textarea>
             </div>
           </div>
 
-
+          <input type="hidden" name="num_seq" value="-1">
+          <input type="hidden" name="ano_ano" value="-1">
         </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary item_info_btn" style="float: left;">Gerar Deliberação</button>
-        <button type="button" class="btn btn-primary item_info_btn" style="float: left;">Gerar Homologação</button>
-        <button type="button" class="btn btn-primary item_info_btn" style="float: left;">Gerar Informação</button>
-        <button type="button" class="btn btn-default" data-dismiss="modal" style="padding: 12px; font-size: 0.8125em;">Fechar</button>
-        <input type="submit" class="btn btn-primary item_info_btn" value="Salvar">
-      </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal" style="padding: 12px; font-size: 0.8125em;">Fechar</button>
+          <input type="submit" class="btn btn-primary item_info_btn" name="envia" value="Criar">
+        </div>
       </form>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
@@ -492,6 +633,7 @@ function addNewFile(elem){
         </div>
       </div>
       <!-- Aqui termina a primeira coluna da pagina -->
+
       <!-- Aqui comeca a segunda coluna da pagina -->
       <div class="col-md-6">
         <ul class="message">
@@ -508,14 +650,16 @@ function addNewFile(elem){
 
               <?php
 
-              $is_disabled = "readonly";
+              $is_disabled = "disabled";
+              $is_readonly = "readonly";
               if($Informes[0]->informe == ""){
                 $is_disabled = "";
+                $is_readonly = "";
               }
 
               echo "<div id=\"informes_row\" class=\"row\">
               <div class=\"col-md-9\" style=\"padding-left: 0.75em; padding-right: 0px; width: 82%;\">
-                <input id=\"informes_input\" class=\"form-control\" type=\"text\" name=\"content\" value=\"".$Informes[0]->informe."\" style=\"margin: 2px; width: 95%;\"/>
+                <input id=\"informes_input\" class=\"form-control\" type=\"text\" name=\"content\" value=\"".$Informes[0]->informe."\" style=\"margin: 2px; width: 95%;\" $is_readonly/>
               </div>
               <div class=\"col-md-1\" style=\"padding: 0px; margin: 0px; margin-top: 0.45em;\">
                 <span class=\"input-group-btn\">
@@ -536,11 +680,11 @@ function addNewFile(elem){
             for($inf = 1; $inf < count($Informes); $inf++){
               echo "<div id=\"".$inf."informes_row\" class=\"row\">
               <div class=\"col-md-9\" style=\"padding-left: 0.75em; padding-right: 0px; width: 82%;\">
-                <input id=\"".$inf."informes_input\" class=\"form-control\" type=\"text\" name=\"".$inf."content\" value=\"".$Informes[$inf]->informe."\" style=\"margin: 2px; width: 95%;\"/>
+                <input id=\"".$inf."informes_input\" class=\"form-control\" type=\"text\" name=\"".$inf."content\" value=\"".$Informes[$inf]->informe."\" style=\"margin: 2px; width: 95%;\" readonly/>
               </div>
               <div class=\"col-md-1\" style=\"padding: 0px; margin: 0px; margin-top: 0.45em;\">
                 <span class=\"input-group-btn\">
-                  <button type=\"button\" id=\"".$inf."informes_add\" class=\"btn btn-success btn-number informes_btn_suc\" readonly>
+                  <button type=\"button\" id=\"".$inf."informes_add\" class=\"btn btn-success btn-number informes_btn_suc\" disabled>
                     <span class=\"glyphicon glyphicon-plus\"></span>
                   </button>
                 </span>
@@ -576,78 +720,78 @@ function addNewFile(elem){
           </div>";
         }
         ?>
-      </div>
-      <div class="form-group footer_head_notaligned" style="width: 100%;">
-        <label>Expediente</label>
-        <br>
-        <ul id="exp_div" class="expediente_border item_ul" ondrop="drop(event)" ondragover="allowDrop(event)">
-          <?php
-          foreach($InUse as $item){
-            if(($item->ano_reuniao == $cur_ano_reuniao) && ($item->num_reuniao == $cur_num_reuniao) && ("exp" == $item->tipo)){
-              echo "<li id=\"busca$busca_n"."_$item->tipo\" class=\"item_pauta_$item->tipo dbclick click\" draggable=\"true\" ondragstart=\"drag(event)\"> $item->name &emsp;&emsp; $item->num_reuniao/$item->ano_reuniao</li>";
-              echo "<input type=\"hidden\" name=\"busca$busca_n"."_$item->tipo\" value=\"$item->name\">";
+        <div class="form-group footer_head_notaligned" style="width: 100%;">
+          <label>Expediente</label>
+          <br>
+          <ul id="exp_div" class="expediente_border item_ul" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <?php
+            foreach($InUse as $item){
+              if(($item->ano_reuniao == $cur_ano_reuniao) && ($item->num_reuniao == $cur_num_reuniao) && ("exp" == $item->tipo)){
+                echo "<li id=\"busca$busca_n"."_$item->tipo\" class=\"item_pauta_$item->tipo dbclick click\" draggable=\"true\" ondragstart=\"drag(event)\"> $item->name &emsp;&emsp; $item->num_reuniao/$item->ano_reuniao</li>";
+                echo "<input type=\"hidden\" name=\"busca$busca_n"."_$item->tipo\" value=\"$item->name\">";
+              }
             }
-          }
-          ?>
-        </ul>
-      </div>
-      <div class="form-group footer_head_notaligned" style="width: 100%;">
-        <label>Para Ciencia</label>
-        <br>
-        <ul id="ciencia_div" class="ciencia_border item_ul" ondrop="drop(event)" ondragover="allowDrop(event)">
-          <?php
-          foreach($InUse as $item){
-            if(($item->ano_reuniao == $cur_ano_reuniao) && ($item->num_reuniao == $cur_num_reuniao) && ("ciencia" == $item->tipo)){
-              echo "<li id=\"busca$busca_n"."_$item->tipo\" class=\"item_pauta_$item->tipo dbclick click\" draggable=\"true\" ondragstart=\"drag(event)\"> $item->name &emsp;&emsp; $item->num_reuniao/$item->ano_reuniao</li>";
-              echo "<input type=\"hidden\" name=\"busca$busca_n"."_$item->tipo\" value=\"$item->name\">";
-            }
-          }
-          ?>
-        </ul>
-      </div>
-      <div class="form-group footer_head_notaligned" style="width: 100%;">
-        <label>Ordem do Dia</label>
-        <br>
-        <ul id="odia_div" class="odia_border item_ul" ondrop="drop(event)" ondragover="allowDrop(event)">
-          <?php
-          foreach($InUse as $item){
-            if(($item->ano_reuniao == $cur_ano_reuniao) && ($item->num_reuniao == $cur_num_reuniao) && ("odia" == $item->tipo)){
-              echo "<li id=\"busca$busca_n"."_$item->tipo\" class=\"item_pauta_$item->tipo dbclick click\" draggable=\"true\" ondragstart=\"drag(event)\"> $item->name &emsp;&emsp; $item->num_reuniao/$item->ano_reuniao</li>";
-              echo "<input type=\"hidden\" name=\"busca$busca_n"."_$item->tipo\" value=\"$item->name\">";
-            }
-          }
-          ?>
-        </ul>
-      </div>
-      <div class="form-group footer_head_notaligned" style="width: 100%;">
-        <label>Homologacao</label>
-        <br>
-        <ul id="homo_div" class="homo_border item_ul" ondrop="drop(event)" ondragover="allowDrop(event)">
-          <?php
-          foreach($InUse as $item){
-            if(($item->ano_reuniao == $cur_ano_reuniao) && ($item->num_reuniao == $cur_num_reuniao) && ("homo" == $item->tipo)){
-              echo "<li id=\"busca$busca_n"."_$item->tipo\" class=\"item_pauta_$item->tipo dbclick click\" draggable=\"true\" ondragstart=\"drag(event)\"> $item->name &emsp;&emsp; $item->num_reuniao/$item->ano_reuniao</li>";
-              echo "<input type=\"hidden\" name=\"busca$busca_n"."_$item->tipo\" value=\"$item->name\">";
-            }
-          }
-          ?>
-        </ul>
-      </div>
-      <div>
-        <div class="row" style="height: 3em;">
-          <div class="col-md-4" style="margin: 0px;">
-            <input type="button" name="item" value="Novo Item" onclick="addItem();"/>
-          </div>
-          <div class="col-md-4" style="margin: 0px;">
-            <input type="submit" name="pauta" value="Gerar Pauta"/>
-          </div>
+            ?>
+          </ul>
         </div>
-        <div class="row" style="height: 3em;">
-          <div class="col-md-4" style="margin: 0px;">
-            <input type="submit" name="ata" value="Gerar Ata"/>
+        <div class="form-group footer_head_notaligned" style="width: 100%;">
+          <label>Para Ciencia</label>
+          <br>
+          <ul id="ciencia_div" class="ciencia_border item_ul" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <?php
+            foreach($InUse as $item){
+              if(($item->ano_reuniao == $cur_ano_reuniao) && ($item->num_reuniao == $cur_num_reuniao) && ("ciencia" == $item->tipo)){
+                echo "<li id=\"busca$busca_n"."_$item->tipo\" class=\"item_pauta_$item->tipo dbclick click\" draggable=\"true\" ondragstart=\"drag(event)\"> $item->name &emsp;&emsp; $item->num_reuniao/$item->ano_reuniao</li>";
+                echo "<input type=\"hidden\" name=\"busca$busca_n"."_$item->tipo\" value=\"$item->name\">";
+              }
+            }
+            ?>
+          </ul>
+        </div>
+        <div class="form-group footer_head_notaligned" style="width: 100%;">
+          <label>Ordem do Dia</label>
+          <br>
+          <ul id="odia_div" class="odia_border item_ul" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <?php
+            foreach($InUse as $item){
+              if(($item->ano_reuniao == $cur_ano_reuniao) && ($item->num_reuniao == $cur_num_reuniao) && ("odia" == $item->tipo)){
+                echo "<li id=\"busca$busca_n"."_$item->tipo\" class=\"item_pauta_$item->tipo dbclick click\" draggable=\"true\" ondragstart=\"drag(event)\"> $item->name &emsp;&emsp; $item->num_reuniao/$item->ano_reuniao</li>";
+                echo "<input type=\"hidden\" name=\"busca$busca_n"."_$item->tipo\" value=\"$item->name\">";
+              }
+            }
+            ?>
+          </ul>
+        </div>
+        <div class="form-group footer_head_notaligned" style="width: 100%;">
+          <label>Homologacao</label>
+          <br>
+          <ul id="homo_div" class="homo_border item_ul" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <?php
+            foreach($InUse as $item){
+              if(($item->ano_reuniao == $cur_ano_reuniao) && ($item->num_reuniao == $cur_num_reuniao) && ("homo" == $item->tipo)){
+                echo "<li id=\"busca$busca_n"."_$item->tipo\" class=\"item_pauta_$item->tipo dbclick click\" draggable=\"true\" ondragstart=\"drag(event)\"> $item->name &emsp;&emsp; $item->num_reuniao/$item->ano_reuniao</li>";
+                echo "<input type=\"hidden\" name=\"busca$busca_n"."_$item->tipo\" value=\"$item->name\">";
+              }
+            }
+            ?>
+          </ul>
+        </div>
+        <div>
+          <div class="row" style="height: 3em;">
+            <div class="col-md-4" style="margin: 0px;">
+              <input type="button" name="item" value="Novo Item" onclick="addItem();"/>
+            </div>
+            <div class="col-md-4" style="margin: 0px;">
+              <input type="submit" name="pauta" value="Gerar Pauta"/>
+            </div>
           </div>
-          <div class="col-md-4" style="margin: 0px;">
-            <input type="submit" name="deliberacao" value=" Nova Reunião"/>
+          <div class="row" style="height: 3em;">
+            <div class="col-md-4" style="margin: 0px;">
+              <input type="submit" name="ata" value="Gerar Ata"/>
+            </div>
+            <div class="col-md-4" style="margin: 0px;">
+              <input type="submit" name="deliberacao" value=" Nova Reunião"/>
+            </div>
           </div>
         </div>
       </div>
