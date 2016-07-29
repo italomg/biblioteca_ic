@@ -24,7 +24,7 @@ function validateSingleInput(oInput) {
     return true;
 }
 
-var _validFileExtensions2 = [".pdf", ".doc"];    
+var _validFileExtensions2 = [".pdf", ".doc", ".docx", ".odt"];    
 function validateSingleInput2(oInput) {
     if (oInput.type == "file") {
         var sFileName = oInput.value;

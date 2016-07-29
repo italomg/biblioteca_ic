@@ -654,10 +654,22 @@ private function console( $data ) {
         if($i < count($flist)-1) {
           if($this->endsWith($flist[$i+1], "_img.pdf")) {
            $a = str_replace(".pdf", "", $flist[$i]);
-           $a = str_replace(".doc", "", $a);
+           
+           if($this->endsWith($a, ".doc")) {
+			   $a = str_replace(".doc", "", $a);
+		   }
+		   
+		   else if($this->endsWith($a, ".docx")) {
+			   $a = str_replace(".docx", "", $a);
+		   }
+		   
+		   else if($this->endsWith($a, ".odt")) {
+			   $a = str_replace(".odt", "", $a);
+		   }
+           
            $b = str_replace("_img.pdf", "", $flist[$i+1]);
 
-							// sao iguais
+		   // sao iguais
            if(strcmp($a, $b) == 0) {
             $imagem = $dest_dir.$flist[$i+1];
             rename($upload_dir.$flist[$i+1], $imagem);
@@ -1040,7 +1052,7 @@ if (($key = array_search ( '..', $files1 )) !== false) {
 
             // remove os arquivos que nao terminam com .pdf ou .doc
 foreach($files1 as $f) {
-  if(!($this->endsWith($f, ".pdf") || $this->endsWith($f, ".doc"))) {
+  if(!($this->endsWith($f, ".pdf") || $this->endsWith($f, ".doc") || $this->endsWith($f, ".docx") || $this->endsWith($f, ".odt"))) {
     unset ( $files1 [$f]);
     unlink ( $upload_dir."/".$f);
   }
