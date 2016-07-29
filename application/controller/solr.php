@@ -240,11 +240,11 @@ public function salvaItem(){
   $ano_seq = intval($_POST["ano_seq"]);
   unset($_POST["ano_seq"]);
 
-  if(isset($_POST["suplemetar"])){
-    $suplemetar = $_POST["suplemetar"];
-    unset($_POST["suplemetar"]);
+  if(isset($_POST["suplementar"])){
+    $suplementar = $_POST["suplementar"];
+    unset($_POST["suplementar"]);
   } else{
-    $suplemetar = "nao";
+    $suplementar = "nao";
   }
 
   $descricao = $_POST["descricao"];
@@ -280,17 +280,19 @@ public function salvaItem(){
     }*/
 
     if($_POST["envia"] == "Salvar"){
-      $this->model->update_item($name, $num_reuniao, $ano_reuniao, $tipo, $num_seq, $ano_seq, $suplemetar, $files, $descricao);
+      $this->model->update_item($name, $num_reuniao, $ano_reuniao, $tipo, $num_seq, $ano_seq, $suplementar, $files, $descricao);
     } else if($_POST["envia"] == "Criar"){
-      $this->model->insert_item($name, $num_reuniao, $ano_reuniao, $tipo, $num_seq, $ano_seq, $suplemetar, $files, $descricao);
+      $this->model->insert_item($name, $num_reuniao, $ano_reuniao, $tipo, $num_seq, $ano_seq, $suplementar, $files, $descricao);
     }
     // where to go after file has been added
-    //header('location: ' . URL . 'solr/schedule');
+    header('location: ' . URL . 'solr/schedule');
 
     // Cache dump
     header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
     header("Cache-Control: post-check=0, pre-check=0", false);
     header("Pragma: no-cache");
+
+    //var_dump($_POST);
 
     
   }
