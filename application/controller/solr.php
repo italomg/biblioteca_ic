@@ -87,25 +87,65 @@ class Solr extends Controller
   require APP . 'view/_templates/footer.php';
 }
 
+public function get_attachs_info(){
+  $aResult = '';
+
+  if(!isset($_POST['arguments']) || (count($_POST['arguments']) != 3)){
+   $aResult = 'Argumentos invalidos!';
+  }
+  //var_dump($_POST);
+
+  if($aResult == ''){
+    $name = $_POST['arguments'][0];
+    $num_reuniao = $_POST['arguments'][1];
+    $ano_reuniao = $_POST['arguments'][2];
+
+    $aResult = $this->model->get_attachs($name, $num_reuniao, $ano_reuniao);
+  }
+
+  $files = array();
+  foreach ($aResult as $file) {
+    if(is_file('download/' . $file->file_name))
+      array_push($files, 'download/' . $file->file_name);
+  }
+  $zipname = 'file.zip';
+  $zip = new ZipArchive;
+  $zip->open($zipname, ZipArchive::CREATE);
+  foreach ($files as $filename) {
+    $zip->addFile($filename);
+  }
+  $zip->close();
+
+  //header('Content-Type: application/zip');
+  //header('Content-disposition: attachment; filename=$zipname');
+  //header('Content-Length: ' . filesize($zipname));
+  //header("Pragma: no-cache");
+  //readfile($zipname);
+  
+  echo json_encode(array('zip' => $zipname));
+}
+
 public function get_item_info(){
 
   $aResult = '';
 
   if(!isset($_POST['arguments']) || (count($_POST['arguments']) != 3)){
    $aResult = 'Argumentos invalidos!';
- }
- //var_dump($_POST);
+  }
+  //var_dump($_POST);
 
- $name = $_POST['arguments'][0];
- $num_reuniao = $_POST['arguments'][1];
- $ano_reuniao = $_POST['arguments'][2];
+  if($aResult == ''){
+    $name = $_POST['arguments'][0];
+    $num_reuniao = $_POST['arguments'][1];
+    $ano_reuniao = $_POST['arguments'][2];
 
- $item_info = $this->model->get_item($name, $num_reuniao, $ano_reuniao);
- $item_attachs = $this->model->get_attachs($name, $num_reuniao, $ano_reuniao);
+    $item_info = $this->model->get_item($name, $num_reuniao, $ano_reuniao);
+    $item_attachs = $this->model->get_attachs($name, $num_reuniao, $ano_reuniao);
 
-    //var_dump($item_attachs);
-
- echo json_encode(array('item_info' => $item_info, 'item_attachs' => $item_attachs));
+    echo json_encode(array('item_info' => $item_info, 'item_attachs' => $item_attachs));
+  } else{
+    echo $aResult;
+  }
 
 }
 
@@ -255,35 +295,11 @@ public function salvaItem(){
     $files[] = basename($file['name']);
   }
 
-    /*if (count($_FILES) > 0) {
+  //TODO adicionar cada um dos arquivos
+  if($_POST["envia"] == "Salvar"){
+    $this->model->update_item($name, $num_reuniao, $ano_reuniao, $tipo, $num_seq, $ano_seq, $suplementar, $files, $descricao);
+    $this->enviarArquivoParam($files);
 
-
-      foreach($_FILES as $file){
-        $fname = basename($file['name']);
-
-
-        if ($file['error'] == 0) {
-
-          $upload_dir = 'tmp';
-
-          if (!file_exists($upload_dir)) {
-            mkdir($upload_dir, 0755, true);
-          }
-
-          $target_file = $upload_dir . '/' . basename($file['name']);
-
-          if (!move_uploaded_file($file["tmp_name"], $target_file) ) {
-            return null;
-          }
-        }
-      }
-    }*/
-
-    if($_POST["envia"] == "Salvar"){
-      $this->model->update_item($name, $num_reuniao, $ano_reuniao, $tipo, $num_seq, $ano_seq, $suplementar, $files, $descricao);
-    } else if($_POST["envia"] == "Criar"){
-      $this->model->insert_item($name, $num_reuniao, $ano_reuniao, $tipo, $num_seq, $ano_seq, $suplementar, $files, $descricao);
-    }
     // where to go after file has been added
     header('location: ' . URL . 'solr/schedule');
 
@@ -292,13 +308,10 @@ public function salvaItem(){
     header("Cache-Control: post-check=0, pre-check=0", false);
     header("Pragma: no-cache");
 
-    //var_dump($_POST);
+  } else if($_POST["envia"] == "Criar"){
+    $this->model->insert_item($name, $num_reuniao, $ano_reuniao, $tipo, $num_seq, $ano_seq, $suplementar, $files, $descricao);
+    $this->enviarArquivoParam($files);
 
-    
-  }
-
-
-  public function geraDoc(){
     // where to go after file has been added
     header('location: ' . URL . 'solr/schedule');
 
@@ -307,36 +320,147 @@ public function salvaItem(){
     header("Cache-Control: post-check=0, pre-check=0", false);
     header("Pragma: no-cache");
 
-    echo "OLA";
+  } else if($_POST["envia"] == "Baixar Anexos"){
+    ob_clean();
+    ob_end_flush();
+    $aResult = $this->model->get_attachs($name, $num_reuniao, $ano_reuniao);
+    $files = array();
+    foreach ($aResult as $file) {
+      if(is_file('download/' . $file->file_name))
+        array_push($files, 'download/' . $file->file_name);
+    }
+    $zipname = 'file.zip';
+    $zip = new ZipArchive;
+    $zip->open($zipname, ZipArchive::CREATE);
+    foreach ($files as $filename) {
+      $zip->addFile($filename);
+    }
+    $zip->close();
+
+    header('Content-Type: application/zip');
+    header('Content-disposition: attachment; filename='.$zipname);
+    header('Content-Length: ' . filesize($zipname));
+    header("Pragma: no-cache");
+    readfile($zipname);
+
+    unlink($zipname);
   }
 
+}
 
-    /**
-     * PAGE: listar
-     * This method handles what happens when you move to http://yourproject/solr/listar
-     */
-    public function listar($page = 1)
-    {
-        // create a client instance
-      $client = new Solarium\Client($this->config);
+public function enviarArquivoParam($files){
+  date_default_timezone_set('America/Sao_Paulo');
+  $creation = date('Y-m-d_H-i-s');
+  //var_dump($_FILES);
+  foreach ($files as $filename) {
+    $fpath = $this->oneFileUpload($filename, $creation, 0);
+    $this->indexaArquivo($fpath, $filename, false, "");
+  }
+}
 
-        // get a select query instance
-      $query = $client->createQuery($client::QUERY_SELECT);
+public function oneFileUpload($filename, $creation)
+{
+    // if we have an id that should be edited
+  $find = array(" ", ".");
+  if ($_FILES[str_replace($find, "_", $filename)]['error'] == 0) {
 
-        // set start and rows param (comparable to SQL limit) using fluent interface
-      $query->setStart(($page-1)*10)->setRows(10);
+    $upload_dir = 'download';
 
-        // this executes the query and returns the result
-      $resultset = $client->execute($query);
-
-        // display the total number of documents found by solr
-      $number_of_results = $resultset->getNumFound();
-
-        // load views
-      require APP . 'view/_templates/header.php';
-      require APP . 'view/solr/listar.php';
-      require APP . 'view/_templates/footer.php';
+    if (!file_exists($upload_dir)) {
+      mkdir($upload_dir, 0755, true);
     }
+
+    $target_file = $upload_dir . '/' . basename($_FILES[str_replace($find, "_", $filename)]['name']);
+
+    if ( !move_uploaded_file($_FILES[str_replace($find, "_", $filename)]["tmp_name"], $target_file) ) {
+      return null;
+    }
+
+    return $target_file;
+  }
+}
+
+public function get_descricoes(){
+  $aResult = '';
+
+  if(!isset($_POST['arguments']) || (count($_POST['arguments']) != 3)) {
+   $aResult = 'Argumentos invalidos!';
+  }
+
+  if($aResult == ''){
+    $names = $_POST['arguments'][0];
+    $num_reuniao = $_POST['arguments'][1];
+    $ano_reuniao = $_POST['arguments'][2];
+
+    $aResult = $this->model->get_descricoes($names, $num_reuniao, $ano_reuniao);
+  }
+
+  echo json_encode($aResult);
+}
+
+
+public function salvaDoc(){
+
+
+  $aResult = '';
+
+  if(!isset($_POST['content'])) {
+   $aResult = 'Conteúdo Vazio !';
+  }
+  if(!isset($_POST['tipo'])) {
+   $aResult = 'Conteúdo Sem Tipo !';
+  }
+
+  if($aResult == ''){
+    $tipo = $_POST['tipo'];
+    $content = $_POST['content'];
+
+    if($tipo == "ata" && isset($_POST['num_reuniao']) && isset($_POST['ano_reuniao'])){
+      $aResult = $this->model->salvaAta($content, $_POST['num_reuniao'], $_POST['ano_reuniao']);
+    } else if($tipo == "pauta" && isset($_POST['num_reuniao']) && isset($_POST['ano_reuniao'])){
+      $aResult = $this->model->salvaPauta($content, $_POST['num_reuniao'], $_POST['ano_reuniao']);
+    } else if($tipo == "documento" && isset($_POST['num_reuniao']) && isset($_POST['ano_reuniao']) && isset($_POST['item_name'])){
+      $aResult = $this->model->salvaDoc($content, $_POST['num_reuniao'], $_POST['ano_reuniao'], $_POST['item_name']);
+    }
+  }
+
+  // where to go after file has been added
+  header('location: ' . URL . 'solr/schedule');
+
+  // Cache dump
+  header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+  header("Cache-Control: post-check=0, pre-check=0", false);
+  header("Pragma: no-cache");
+}
+
+
+  /**
+   * PAGE: listar
+   * This method handles what happens when you move to http://yourproject/solr/listar
+   */
+  public function listar($page = 1)
+  {
+      // create a client instance
+    $client = new Solarium\Client($this->config);
+
+      // get a select query instance
+    $query = $client->createQuery($client::QUERY_SELECT);
+
+      // set start and rows param (comparable to SQL limit) using fluent interface
+    $query->setStart(($page-1)*10)->setRows(10);
+
+      // this executes the query and returns the result
+    $resultset = $client->execute($query);
+
+      // display the total number of documents found by solr
+    $number_of_results = $resultset->getNumFound();
+
+    //var_dump($resultset);
+      // load views
+    require APP . 'view/_templates/header.php';
+    require APP . 'view/solr/listar.php';
+    require APP . 'view/_templates/footer.php';
+  }
 
 
 
@@ -584,6 +708,7 @@ private function console( $data ) {
         $fname = basename($_FILES['userfile']['name'][0]);
 
         $fpath = $this->fileUpload('userfile', $creation, 0);
+
         if (!empty($_FILES['userfile']['name'][1])) {
          $upload2 = $this->fileUpload('userfile', $creation, 1);
        } else {
@@ -656,21 +781,21 @@ private function console( $data ) {
            $a = str_replace(".pdf", "", $flist[$i]);
            
            if($this->endsWith($a, ".doc")) {
-			   $a = str_replace(".doc", "", $a);
-		   }
-		   
-		   else if($this->endsWith($a, ".docx")) {
-			   $a = str_replace(".docx", "", $a);
-		   }
-		   
-		   else if($this->endsWith($a, ".odt")) {
-			   $a = str_replace(".odt", "", $a);
-		   }
-           
-           $b = str_replace("_img.pdf", "", $flist[$i+1]);
+            $a = str_replace(".doc", "", $a);
+          }
+
+          else if($this->endsWith($a, ".docx")) {
+            $a = str_replace(".docx", "", $a);
+          }
+
+          else if($this->endsWith($a, ".odt")) {
+            $a = str_replace(".odt", "", $a);
+          }
+
+          $b = str_replace("_img.pdf", "", $flist[$i+1]);
 
 		   // sao iguais
-           if(strcmp($a, $b) == 0) {
+          if(strcmp($a, $b) == 0) {
             $imagem = $dest_dir.$flist[$i+1];
             rename($upload_dir.$flist[$i+1], $imagem);
           }
@@ -942,10 +1067,12 @@ function indexaArquivo($fpath, $fname, $edicao, $image )
         $upload_dir = 'download';
 
         if (!file_exists($upload_dir)) {
+          echo $upload_dir;
           mkdir($upload_dir, 0755, true);
         }
 
         $target_file = $upload_dir . '/' . basename($_FILES[$input_name]['name'][$i]);
+        echo getcwd();
 
         if ( !move_uploaded_file($_FILES[$input_name]["tmp_name"][$i], $target_file) ) {
           return null;

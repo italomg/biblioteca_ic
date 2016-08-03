@@ -70,7 +70,7 @@ class Model
 
     public function set_available($name, $num_reuniao, $ano_reuniao){
 
-      $name = str_replace(' ', '', $name);
+      $name = trim($name);
       $sql = "UPDATE itens SET in_use=False WHERE name = :name AND num_reuniao = :num_reuniao AND ano_reuniao = :ano_reuniao";
       $query = $this->db->prepare($sql);
       $parameters = array(':name' => $name, ':num_reuniao' => $num_reuniao, ':ano_reuniao' => $ano_reuniao);
@@ -80,7 +80,7 @@ class Model
 
     public function set_inUse($name, $num_reuniao, $ano_reuniao){
 
-      $name = str_replace(' ', '', $name);
+      $name = trim($name);
       $sql = "UPDATE itens SET in_use=True WHERE name = :name AND num_reuniao = :num_reuniao AND ano_reuniao = :ano_reuniao";
       $query = $this->db->prepare($sql);
       $parameters = array(':name' => $name, ':num_reuniao' => $num_reuniao, ':ano_reuniao' => $ano_reuniao);
@@ -112,8 +112,8 @@ class Model
 
     public function buscaPauta($name, $num_reuniao, $ano_reuniao, $tipo){
 
-      $name = str_replace(' ', '', $name);
-      $tipo = str_replace(' ', '', $tipo);
+      $name = trim($name);
+      $tipo = trim($tipo);
       $name = "%" . $name . "%";
       $sql = "SELECT * FROM itens WHERE in_use = False ";
 
@@ -236,10 +236,10 @@ class Model
       
       $sql = "";
       if($suplementar == "sim"){
-        $sql = "INSERT INTO itens values(:name, NOW(), :num_reuniao, :ano_reuniao, :num_seq, :ano_seq, :tipo, :descricao, false, true, true)";
+        $sql = "INSERT INTO itens values(:name, NOW(), :num_reuniao, :ano_reuniao, :num_seq, :ano_seq, :tipo, :descricao,NULL, false, true, true)";
       }
       else{
-        $sql = "INSERT INTO itens values(:name, NOW(), :num_reuniao, :ano_reuniao, :num_seq, :ano_seq, :tipo, :descricao, false, false, true)";
+        $sql = "INSERT INTO itens values(:name, NOW(), :num_reuniao, :ano_reuniao, :num_seq, :ano_seq, :tipo, :descricao,NULL, false, false, true)";
       }
       $query = $this->db->prepare($sql);
 
@@ -260,6 +260,62 @@ class Model
 
       return $query->rowCount(); 
     }
+
+    //Parametrizar esta funcao no futuro
+    public function get_descricoes($names, $num_reuniao, $ano_reuniao){
+
+      $sql = "SELECT descricao, suplementar, tipo FROM itens WHERE (num_reuniao = $num_reuniao AND ano_reuniao = $ano_reuniao) AND (";
+
+      for($i = 0; $i < count($names); $i++){
+        $sql = $sql . " name = \"" . $names[$i] . "\" ";
+        if($i < count($names)-1){
+          $sql = $sql . " OR";
+        }
+      }
+
+      $sql = $sql . ")";
+
+      $query = $this->db->prepare($sql);
+      $query->execute();
+
+      return $query->fetchAll();
+    }
+
+    public function salvaDoc($content, $num_reuniao, $ano_reuniao, $name){
+
+      $content = trim($content);
+      $name = trim($name);
+
+      $sql = "UPDATE itens SET documento = :content WHERE name = :name AND num_reuniao = :num_reuniao AND ano_reuniao = :ano_reuniao";
+      $query = $this->db->prepare($sql);
+      $parameters = array(':name' => $name, ':num_reuniao' => $num_reuniao, ':ano_reuniao' => $ano_reuniao, ':content' => $content);
+
+      $query->execute($parameters);
+    }
+
+    public function salvaAta($content, $num_reuniao, $ano_reuniao){
+
+      $content = trim($content);
+
+      $sql = "UPDATE reunioes SET ata = :content WHERE num = :num_reuniao AND ano = :ano_reuniao";
+      $query = $this->db->prepare($sql);
+      $parameters = array(':num_reuniao' => $num_reuniao, ':ano_reuniao' => $ano_reuniao, ':content' => $content);
+
+      $query->execute($parameters);
+    }
+
+    public function salvaPauta($content, $num_reuniao, $ano_reuniao){
+
+      $content = trim($content);
+
+      $sql = "UPDATE reunioes SET pauta = :content WHERE num = :num_reuniao AND ano = :ano_reuniao";
+      $query = $this->db->prepare($sql);
+      $parameters = array(':num_reuniao' => $num_reuniao, ':ano_reuniao' => $ano_reuniao, ':content' => $content);
+
+      $query->execute($parameters);
+    }
+
+
 
     /**
      * Get all songs from database

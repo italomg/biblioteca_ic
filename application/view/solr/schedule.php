@@ -39,6 +39,7 @@
     'insertdatetime table contextmenu paste'
     ]
     });</script>
+  <script src="<?php echo URL; ?>js/fileDownload.js" type="text/javascript"></script>
 
   <!-- Start my scripts -->
   <script>
@@ -195,80 +196,92 @@
         name = splited[0].trim();
         num_reuniao = splited[1].split("/")[0];
         ano_reuniao = splited[1].split("/")[1];
+        jsonReuniaoData = "";
+        reuniaoData = "";
 
-        jQuery.post("<?php echo URL; ?>solr/get_item_info", {arguments: [name, num_reuniao, ano_reuniao]}, function(data){
+        jQuery.post("<?php echo URL; ?>solr/get_reuniao_info", {arguments: [num_reuniao, ano_reuniao]}, function(data){
+          jsonReuniaoData = data;
+          reuniaoData = JSON.parse(data);
+          jQuery.post("<?php echo URL; ?>solr/get_item_info", {arguments: [name, num_reuniao, ano_reuniao]}, function(data){
+            jsonData = data;
+            data = JSON.parse(data);
+            $('#item_info_form')[0].reset();
+            $('#item_info_exp').removeAttr("selected");
+            $('#item_info_ciencia').removeAttr("selected");
+            $('#item_info_odia').removeAttr("selected");
+            $('#item_info_homo').removeAttr("selected");
 
-          data = JSON.parse(data);
-          $('#item_info_form')[0].reset();
-          $('#item_info_exp').removeAttr("selected");
-          $('#item_info_ciencia').removeAttr("selected");
-          $('#item_info_odia').removeAttr("selected");
-          $('#item_info_homo').removeAttr("selected");
+            //console.log(data);
+            $("#item_info_nome").val(data.item_info[0].name);
+            $("#item_info_"+data.item_info[0].tipo).prop("selected", "selected").change();
+            if(data.item_info[0].suplementar == "0")
+              $("#squaredOne").prop("checked", false);
+            else
+              $("#squaredOne").prop("checked", true);
 
-          //console.log(data);
-          $("#item_info_nome").val(data.item_info[0].name);
-          $("#item_info_"+data.item_info[0].tipo).prop("selected", "selected").change();
-          if(data.item_info[0].suplementar == "0")
-            $("#squaredOne").prop("checked", false);
-          else
-            $("#squaredOne").prop("checked", true);
+            var dia = reuniaoData[0].data.split("-")[2];
+            var mes = reuniaoData[0].data.split("-")[1];
+            var ano = reuniaoData[0].data.split("-")[0];
 
-          var no = 1;
-          var tipo_reuniao = "Extraordinária";
-          var data_reuniao = "01/12/2014";
+            $("#item_info_reuniao").html(reuniaoData[0].num +'/'+ reuniaoData[0].ano +'&emsp;'+ reuniaoData[0].no + '&ordf; Reunião ' + reuniaoData[0].tipo + ' --- ' + dia +'/'+ mes +'/'+ ano);
 
-          $("#item_info_reuniao").html(num_reuniao +'/'+ ano_reuniao +'&emsp;'+ no + '&ordf; Reunião ' + tipo_reuniao + ' --- ' + data_reuniao);
+            if(data.item_info[0].tipo === "exp"){
+              $("#gera_deliberacao").hide();
+              $("#gera_informacao").hide();
+              $("#gera_homologacao").hide();
 
-          if(data.item_info[0].tipo === "exp"){
-            $("#gera_deliberacao").hide();
-            $("#gera_informacao").hide();
-            $("#gera_homologacao").hide();
+            } else if(data.item_info[0].tipo === "ciencia"){
+              $("#gera_deliberacao").hide();
+              $("#gera_homologacao").hide();
+              $("#gera_informacao").show();
+              $("#gera_informacao").attr("onclick", "").attr("onclick", "geraDoc('INFORMA&Ccedil;&Atilde;O', "+jsonData+", "+jsonReuniaoData+");");
 
-          } else if(data.item_info[0].tipo === "ciencia"){
-            $("#gera_deliberacao").hide();
-            $("#gera_homologacao").hide();
-            $("#gera_informacao").show();
+            } else if(data.item_info[0].tipo === "odia"){
+              $("#gera_informacao").hide();
+              $("#gera_homologacao").hide();
+              $("#gera_deliberacao").show();
+              $("#gera_deliberacao").attr("onclick", "").attr("onclick", "geraDoc('DELIBERA&Ccedil;&Atilde;O', "+jsonData+", "+jsonReuniaoData+");");
 
-          } else if(data.item_info[0].tipo === "odia"){
-            $("#gera_informacao").hide();
-            $("#gera_homologacao").hide();
-            $("#gera_deliberacao").show();
+            } else if(data.item_info[0].tipo === "homo"){
+              $("#gera_deliberacao").hide();
+              $("#gera_informacao").hide();
+              $("#gera_homologacao").show();
+              $("#gera_homologacao").attr("onclick", "").attr("onclick", "geraDoc('HOMOLOGA&Ccedil;&Atilde;O', "+jsonData+", "+jsonReuniaoData+");");
 
-          } else if(data.item_info[0].tipo === "homo"){
-            $("#gera_deliberacao").hide();
-            $("#gera_informacao").hide();
-            $("#gera_homologacao").show();
+            }
 
-          }        
-
-          if(data.item_info[0].seq_num > 0)
-            $("#item_info_seq_num").val(data.item_info[0].seq_num);
-          if(data.item_info[0].seq_ano > 0)
-            $("#item_info_seq_ano").val(data.item_info[0].seq_ano);
+            if(data.item_info[0].seq_num > 0 && data.item_info[0].seq_ano > 0){
+              $("#item_info_seq_num").val(data.item_info[0].seq_num);
+              $("#item_info_seq_ano").val(data.item_info[0].seq_ano);
+            } else{
+              $("#item_info_seq_num").val("");
+              $("#item_info_seq_ano").val("");
+            }
 
 
-          item_info_data = data.item_info[0].date.split(" ")[0].split('-');
-          $("#item_info_datahora").html(item_info_data[2] +'/'+ item_info_data[1] +'/'+ item_info_data[0] + '&emsp; - &emsp;' + data.item_info[0].date.split(" ")[1]);
+            item_info_data = data.item_info[0].date.split(" ")[0].split('-');
+            $("#item_info_datahora").html(item_info_data[2] +'/'+ item_info_data[1] +'/'+ item_info_data[0] + '&emsp; - &emsp;' + data.item_info[0].date.split(" ")[1]);
 
-          tinymce.get("item_info_descricao").setContent(data.item_info[0].descricao);
-          $("#item_info_descricao").val(data.item_info[0].descricao);
+            tinymce.get("item_info_descricao").setContent(data.item_info[0].descricao);
+            //$("#item_info_descricao").val(data.item_info[0].descricao);
 
-          //FILES
-          $("#item_info_file_list").empty();
-          $("#item_info_file_list").append('<div id="file_clearfix" class="clearfix"></div>');
+            //FILES
+            $("#item_info_file_list").empty();
+            $("#item_info_file_list").append('<div id="file_clearfix" class="clearfix"></div>');
 
-          N = Object.keys(data.item_attachs).length;
-          for(i = 0; i < N; i++){
-            $('<li class="item_info_file" style="width: 85%;"> <img src="<?php echo URL; ?>images/pdf-icon.gif" alt="image"/> &emsp; ' + data.item_attachs[i].file_name + '</li>\
-              <li style="display: inline; margin-top:8px; margin-left: 5px;">\
-                <span class="input-group-btn" style="display: inline;">\
-                  <button type="button" class="btn btn-danger btn-number item_info_rmv_file">\
-                    <span class="glyphicon glyphicon-trash"></span>\
-                  </button>\
-                </span>\
-              </li>').insertBefore("#file_clearfix");
-          }
+            N = Object.keys(data.item_attachs).length;
+            for(i = 0; i < N; i++){
+              $('<li class="item_info_file" style="width: 85%;"> <img src="<?php echo URL; ?>images/pdf-icon.gif" alt="image"/> &emsp; ' + data.item_attachs[i].file_name + '</li>\
+                <li style="display: inline; margin-top:8px; margin-left: 5px;">\
+                  <span class="input-group-btn" style="display: inline;">\
+                    <button type="button" class="btn btn-danger btn-number item_info_rmv_file">\
+                      <span class="glyphicon glyphicon-trash"></span>\
+                    </button>\
+                  </span>\
+                </li>').insertBefore("#file_clearfix");
+            }
 
+          });
         });
 
         $("#item_info_modal").modal();
@@ -327,26 +340,25 @@ function addNewFile(elem, clearfixid){
 
 function addItem(){
 
-  ano_reuniao = Number("<?php echo $cur_ano_reuniao?>");
-  num_reuniao = Number("<?php echo $cur_num_reuniao?>");
+  var ano_reuniao = Number("<?php echo $cur_ano_reuniao?>");
+  var num_reuniao = Number("<?php echo $cur_num_reuniao?>");
 
   $('#insere_item_form')[0].reset();
+  tinymce.get("insere_item_descricao").setContent("");
   //FILES
   $("#insere_item_file_list").empty();
   $("#insere_item_file_list").append('<div id="insere_file_clearfix" class="clearfix"></div>');
 
   jQuery.post("<?php echo URL; ?>solr/get_reuniao_info", {arguments: [num_reuniao, ano_reuniao]}, function(data){
-    console.log(data);
-    data = JSON.parse(data);
+    var reuniaoData = JSON.parse(data);
+    var dia = reuniaoData[0].data.split("-")[2];
+    var mes = reuniaoData[0].data.split("-")[1];
+    var ano = reuniaoData[0].data.split("-")[0];
+
+    $("#insere_item_reuniao").html(reuniaoData[0].num +'/'+ reuniaoData[0].ano +'&emsp;'+ reuniaoData[0].no + '&ordf; Reunião ' + reuniaoData[0].tipo + ' --- ' + dia +'/'+ mes +'/'+ ano);
+    $("#insere_item_ano_reuniao").val(ano_reuniao);
+    $("#insere_item_num_reuniao").val(num_reuniao);
   });
-
-  var no = 1;
-  var tipo_reuniao = "Extraordinária";
-  var data_reuniao = "01/12/2014";
-
-  $("#insere_item_reuniao").html(num_reuniao +'/'+ ano_reuniao +'&emsp;'+ no + '&ordf; Reunião ' + tipo_reuniao + ' --- ' + data_reuniao);
-  $("#insere_item_ano_reuniao").val(ano_reuniao);
-  $("#insere_item_num_reuniao").val(num_reuniao);
 
   $("#insere_item_modal").modal();
 }
@@ -372,15 +384,450 @@ function copyItem(){
   $("#insere_item_squaredOne").prop("checked", false);
   $("#insere_item_reuniao").html($("#item_info_reuniao").html());
   $("#insere_item_datahora").html($("#item_info_datahora").html());
-  $("#insere_item_descricao").text($("#item_info_descricao").text());
+
+  tinymce.get("insere_item_descricao").setContent(tinymce.get("item_info_descricao").getContent());
 
   $("#item_info_modal").modal('hide');
   $("#insere_item_modal").modal();
 }
 
-function geraDoc(tipo){
+function makeString(object) {
+  if (object == null) return '';
+  return String(object);
+};
+function escapeRegExp(str) {
+  return makeString(str).replace(/([.*+?^=!:${}()|[\]\/\\])/g, '\\$1');
+};
+function defaultToWhiteSpace(characters) {
+  if (characters == null)
+    return '\\s';
+  else if (characters.source)
+    return characters.source;
+  else
+    return '[' + escapeRegExp(characters) + ']';
+};
+function myltrim(str, characters) {
+  var nativeTrimLeft = String.prototype.trimLeft;
+  str = makeString(str);
+  if (!characters && nativeTrimLeft) 
+    return nativeTrimLeft.call(str);
+  characters = defaultToWhiteSpace(characters);
+  return str.replace(new RegExp('^' + characters + '+'), '');
+};
+function mytrim(str, characters) {
+  var nativeTrim = String.prototype.trim;
+  str = makeString(str);
+  if (!characters && nativeTrim) 
+    return nativeTrim.call(str);
+  characters = defaultToWhiteSpace(characters);
+  return str.replace(new RegExp('^' + characters + '+|' + characters + '+$', 'g'), '');
+};
+function myrtrim(str, characters) {
+  var nativeTrimRight = String.prototype.trimRight;
+  str = makeString(str);
+  if (!characters && nativeTrimRight) 
+      return nativeTrimRight.call(str);
+  characters = defaultToWhiteSpace(characters);
+  return str.replace(new RegExp(characters + '+$'), '');
+};
+
+function geraDoc(tipoDoc, itemData, reuniaoData){
+
+  $("#gera_doc_hidden_tipo").val("documento");
+  $("#gera_doc_hidden_name").val(itemData.item_info[0].name);
+  $("#gera_doc_hidden_num").val("<?php echo $cur_num_reuniao; ?>");
+  $("#gera_doc_hidden_ano").val("<?php echo $cur_ano_reuniao; ?>");
+
+  if(itemData.item_info[0].documento == null){
+    var tipo  = reuniaoData[0].tipo.replace(/á/g, '&aacute;').replace(/Á/g, '&Aacute;');
+    var dia = reuniaoData[0].data.split("-")[2];
+    var mes = reuniaoData[0].data.split("-")[1];
+    var ano = reuniaoData[0].data.split("-")[0];
+    var data = dia + "/" + mes + "/" + ano;
+
+    var seq = itemData.item_info[0].seq_num + "/" + itemData.item_info[0].seq_ano;
+
+    var assunto = $('<div/>').text(itemData.item_info[0].name).html();
+    var conteudo = itemData.item_info[0].descricao;
+
+    conteudo = conteudo.replace("<p>","");
+    conteudo = conteudo.replace("</p>","");
+
+    littleTxt = "";
+    if(tipoDoc === "INFORMA&Ccedil;&Atilde;O"){
+      littleTxt = "tomou ci&ecirc;ncia do";
+    }
+    else if(tipoDoc === "DELIBERA&Ccedil;&Atilde;O"){
+      littleTxt = "aprovou a "; 
+    }
+
+    var template = '<p style="text-align: center;"><strong>'+ reuniaoData[0].no+ '&ordf;. REUNI&Atilde;O '+ tipo +' DA</strong></p>\
+    <p style="text-align: center;"><strong>CONGREGA&Ccedil;&Atilde;O DO INSTITUTO DE COMPUTA&Ccedil;&Atilde;O,</strong></p>\
+    <p style="text-align: center;"><strong>REALIZADA EM '+ data +'</strong></p>\
+    <p style="text-align: center;">&nbsp;</p>\
+    <p style="text-align: center;"><strong>'+ tipoDoc +' N&ordm; '+ seq +'</strong></p>\
+    <p style="text-align: center;">&nbsp;</p>\
+    <p style="text-align: left;"><strong>Assunto:&nbsp;</strong>'+ assunto +'.</p>\
+    <p>A Congrega&ccedil;&atilde;o do Instituto de Computa&ccedil;&atilde;o, reunida em '+ data +', <strong>'+ littleTxt +''+ conteudo+'</strong> </p>\
+    <p style="text-align: center;">&nbsp;</p>\
+    <p style="text-align: center;">&nbsp;</p>\
+    <p style="text-align: center;">Campinas, '+ dia +' de Maio de '+ ano +'.</p>\
+    <p style="text-align: center;">&nbsp;</p>\
+    <p style="text-align: center;">&nbsp;</p>\
+    <p style="text-align: center;"><strong>Prof. Dr. XXXXXXXXXXXXXXXXXXX</strong></p>\
+    <p style="text-align: center;"><strong>Presidente da Congrega&ccedil;&atilde;o</strong></p>';
+    tinymce.get("gera_doc_content").setContent(template);
+  } else {
+    tinymce.get("gera_doc_content").setContent(itemData.item_info[0].documento);
+  }
+  
+
   $("#item_info_modal").modal('hide');
   $("#gera_doc_modal").modal();
+}
+
+function geraPauta(){
+
+  $("#gera_doc_hidden_tipo").val("pauta");
+  $("#gera_doc_hidden_num").val("<?php echo $cur_num_reuniao; ?>");
+  $("#gera_doc_hidden_ano").val("<?php echo $cur_ano_reuniao; ?>");
+
+
+  var template = '';
+  names = [];
+
+  $('#exp_div').children().each(function () {
+    names.push(this.innerHTML.split(/\s{4}/)[0].trim());
+  });
+  $('#ciencia_div').children().each(function () {
+    names.push(this.innerHTML.split(/\s{4}/)[0].trim());
+  });
+  $('#odia_div').children().each(function () {
+    names.push(this.innerHTML.split(/\s{4}/)[0].trim());
+  });
+  $('#homo_div').children().each(function () {
+    names.push(this.innerHTML.split(/\s{4}/)[0].trim());
+  });
+
+  ano_reuniao = Number("<?php echo $cur_ano_reuniao?>");
+  num_reuniao = Number("<?php echo $cur_num_reuniao?>");
+
+  //console.log(names);
+  if(names.length > 0){
+    jQuery.post("<?php echo URL; ?>solr/get_descricoes", {arguments: [names, num_reuniao, ano_reuniao]}, function(data){
+      descricaoData = JSON.parse(data);
+      jQuery.post("<?php echo URL; ?>solr/get_reuniao_info", {arguments: [num_reuniao, ano_reuniao]}, function(data){
+        reuniaoData = JSON.parse(data);
+        jQuery.post("<?php echo URL; ?>solr/get_reuniao_info", {arguments: [reuniaoData[0].ata_ant_num, reuniaoData[0].ata_ant_ano]}, function(data){
+          reuniaoAntigaData = JSON.parse(data);
+
+          if(reuniaoData[0].pauta == null){
+            var tipo  = reuniaoData[0].tipo.replace(/á/g, '&aacute;').replace(/Á/g, '&Aacute;');
+            var tipoAntigo  = reuniaoAntigaData[0].tipo.replace(/á/g, '&aacute;').replace(/Á/g, '&Aacute;');
+
+            var onlyData = reuniaoData[0].data.split(" ")[0];
+            var hh = reuniaoData[0].data.split(" ")[1].split(":")[0];
+            var mm = reuniaoData[0].data.split(" ")[1].split(":")[1];
+            var dia = onlyData.split("-")[2];
+            var mes = onlyData.split("-")[1];
+            var ano = onlyData.split("-")[0];
+            var data = dia + "/" + mes + "/" + ano;
+
+            var onlyDataAntiga = reuniaoAntigaData[0].data.split(" ")[0];
+            var dia = onlyDataAntiga.split("-")[2];
+            var mes = onlyDataAntiga.split("-")[1];
+            var ano = onlyDataAntiga.split("-")[0];
+            var dataAntiga = dia + "/" + mes + "/" + ano;
+
+            var exp_content = "";
+            var ciencia_content = "";
+            var odia_content = "";
+            var homo_content = "";
+
+            var exp_c = 2;
+            var ciencia_c = 1;
+            var odia_c = 1;
+            var homo_c = 1;
+
+            descricaoData.forEach(function(item){
+              if(item.suplementar == 0){
+                if(item.tipo == "exp"){
+                  conteudo = item.descricao;
+                  conteudo = conteudo.replace("<p>","");
+                  conteudo = conteudo.replace("</p>","");
+                  exp_content = exp_content +'<p>'+ exp_c + ' - ' + conteudo + '</p>';
+                  exp_c = exp_c + 1;
+
+                } else if(item.tipo == "ciencia"){
+                  conteudo = item.descricao;
+                  conteudo = conteudo.replace("<p>","");
+                  conteudo = conteudo.replace("</p>","");
+                  ciencia_content = ciencia_content +'<p>'+ ciencia_c + ' - ' + conteudo + '</p>';
+                  ciencia_c = ciencia_c + 1;
+
+                } else if(item.tipo == "odia"){
+                  conteudo = item.descricao;
+                  conteudo = conteudo.replace("<p>","");
+                  conteudo = conteudo.replace("</p>","");
+                  odia_content = odia_content +'<p>'+ odia_c + ' - ' + conteudo + '</p>';
+                  odia_c = odia_c + 1;
+
+                } else if(item.tipo == "homo"){
+                  conteudo = item.descricao;
+                  conteudo = conteudo.replace("<p>","");
+                  conteudo = conteudo.replace("</p>","");
+                  homo_content = homo_content +'<p>'+ homo_c + ' - ' + conteudo + '</p>';
+                  homo_c = homo_c + 1;
+
+                }
+              }
+              //console.log(item.descricao);
+            });
+
+
+            template = '<h3><strong>De ordem, convocamos os Membros da Congrega&ccedil;&atilde;o do Instituto de Computa&ccedil;&atilde;o para a '+ reuniaoData[0].no +'&ordf; Reuni&atilde;o '+ tipo +' da Congrega&ccedil;&atilde;o, a realizar-se dia '+ data +', &agrave;s '+ hh +'h'+ mm +', na sala '+ reuniaoData[0].local +' do Instituto de Computa&ccedil;&atilde;o.</strong></h3>\
+              <p>&nbsp;</p>\
+              <h2>ATA DE REUNI&Atilde;O:</h2>\
+              <p>'+ reuniaoAntigaData[0].no +'&ordf; Reuni&atilde;o '+ tipoAntigo +' da Congrega&ccedil;&atilde;o, realizada no dia '+ dataAntiga +'</p>\
+              <p>&nbsp;</p>\
+              <h2>EXPEDIENTE:</h2>\
+              <p>1 - Informes Gerais.</p>\
+              '+ exp_content +'\
+              <p>&nbsp;</p>\
+              <h2>PARA CI&Ecirc;NCIA:</h2>\
+              '+ ciencia_content +'\
+              <p>&nbsp;</p>\
+              <h2>ORDEM DO DIA <br /> PARA APROVA&Ccedil;&Atilde;O:</h2>\
+              '+ odia_content +'\
+              <p>&nbsp;</p>\
+              <h2>HOMOLOGA&Ccedil;&Atilde;O:</h2>\
+              '+ homo_content +'\
+              <p>&nbsp;</p>\
+              <p>---</p>\
+              <p>Obs.: Os documentos encontram-se &agrave; disposi&ccedil;&atilde;o na Sala 57 ou no link "Reuni&otilde;es" <a href="http://congrega.ic.unicamp.br/">http://congrega.ic.unicamp.br/</a>. Para acesso utilize: username "guestic" e password "guestic".</p>';
+              tinymce.get("gera_doc_content").setContent(template);
+          } else {
+            tinymce.get("gera_doc_content").setContent(reuniaoData[0].pauta);
+          }
+          $("#gera_doc_modal").modal();
+        });
+      });
+    });
+  }
+}
+
+function geraAta(){
+
+
+  $("#gera_doc_hidden_tipo").val("ata");
+  $("#gera_doc_hidden_num").val("<?php echo $cur_num_reuniao; ?>");
+  $("#gera_doc_hidden_ano").val("<?php echo $cur_ano_reuniao; ?>");
+
+  var template = '';
+  var names = [];
+  var informes = "";
+
+  $('#exp_div').children().each(function () {
+    names.push(this.innerHTML.split(/\s{4}/)[0].trim());
+  });
+  $('#ciencia_div').children().each(function () {
+    names.push(this.innerHTML.split(/\s{4}/)[0].trim());
+  });
+  $('#odia_div').children().each(function () {
+    names.push(this.innerHTML.split(/\s{4}/)[0].trim());
+  });
+  $('#homo_div').children().each(function () {
+    names.push(this.innerHTML.split(/\s{4}/)[0].trim());
+  });
+
+  var cur_letter = 'a';
+  $('#informes_div').children().each(function () {
+    curVal = $(this).children(':first').children(':first').val();
+    if(curVal != undefined && curVal.length > 0){
+      informes = informes + '<strong>('+ cur_letter +')</strong>' + $(this).children(':first').children(':first').val() + '. ';
+      cur_letter = String.fromCharCode(cur_letter.charCodeAt() + 1);
+    }
+  });
+
+  //MAP START
+
+  var ordinal = {};
+  ordinal[1] = "PRIMEIRA";
+  ordinal[2] = "SEGUNDA";
+  ordinal[3] = "TERCEIRA";
+  ordinal[4] = "QUARTA";
+  ordinal[5] = "QUINTA";
+  ordinal[6] = "SEXTA";
+  ordinal[7] = "S&Eacute;TIMA";
+  ordinal[8] = "OITAVA";
+  ordinal[9] = "NONA";
+  ordinal[10] = "D&Eacute;CIMA";
+  ordinal[11] = "D&Eacute;CIMA PRIMEIRA";
+  ordinal[12] = "D&Eacute;CIMA SEGUNDA";
+  ordinal[13] = "D&Eacute;CIMA TERCEIRA";
+  ordinal[14] = "D&Eacute;CIMA QUARTA";
+  ordinal[15] = "D&Eacute;CIMA QUINTA";
+  ordinal[16] = "D&Eacute;CIMA SEXTA";
+  ordinal[17] = "D&Eacute;CIMA S&Eacute;TIMA";
+  ordinal[18] = "D&Eacute;CIMA OITAVA";
+  ordinal[19] = "D&Eacute;CIMA NONA";
+  ordinal[20] = "VIG&Eacute;SIMA";
+  ordinal[21] = "VIG&Eacute;SIMA PRIMEIRA";
+
+  //MAP END
+
+  ano_reuniao = Number("<?php echo $cur_ano_reuniao?>");
+  num_reuniao = Number("<?php echo $cur_num_reuniao?>");
+
+  //console.log(names);
+  if(names.length > 0){
+    jQuery.post("<?php echo URL; ?>solr/get_descricoes", {arguments: [names, num_reuniao, ano_reuniao]}, function(data){
+      //console.log(data);
+      descricaoData = JSON.parse(data);
+      jQuery.post("<?php echo URL; ?>solr/get_reuniao_info", {arguments: [num_reuniao, ano_reuniao]}, function(data){
+        reuniaoData = JSON.parse(data);
+        jQuery.post("<?php echo URL; ?>solr/get_reuniao_info", {arguments: [reuniaoData[0].ata_ant_num, reuniaoData[0].ata_ant_ano]}, function(data){
+          reuniaoAntigaData = JSON.parse(data);
+
+          if(reuniaoData[0].ata == null){
+            var tipo  = reuniaoData[0].tipo.replace(/á/g, '&aacute;').replace(/Á/g, '&Aacute;');
+            var tipoAntigo  = reuniaoAntigaData[0].tipo.replace(/á/g, '&aacute;').replace(/Á/g, '&Aacute;');
+
+            var onlyData = reuniaoData[0].data.split(" ")[0];
+            var hh = reuniaoData[0].data.split(" ")[1].split(":")[0];
+            var mm = reuniaoData[0].data.split(" ")[1].split(":")[1];
+            var dia = onlyData.split("-")[2];
+            var mes = onlyData.split("-")[1];
+            var ano = onlyData.split("-")[0];
+            var data = dia + "/" + mes + "/" + ano;
+
+            var onlyDataAntiga = reuniaoAntigaData[0].data.split(" ")[0];
+            var dia = onlyDataAntiga.split("-")[2];
+            var mes = onlyDataAntiga.split("-")[1];
+            var ano = onlyDataAntiga.split("-")[0];
+            var dataAntiga = dia + "/" + mes + "/" + ano;
+
+            var exp_content = "";
+            var ciencia_content = "";
+            var odia_content = "";
+            var homo_content = "";
+
+            var exp_c = 2;
+            var ciencia_c = 1;
+            var odia_c = 1;
+            var homo_c = 1;
+
+
+            var suplementar_content = "";
+            var supl_exp_content = "";
+            var supl_ciencia_content = "";
+            var supl_odia_content = "";
+            var supl_homo_content = "";
+
+            var supl_exp_c = 1;
+            var supl_ciencia_c = 1;
+            var supl_odia_c = 1;
+            var supl_homo_c = 1;          
+
+            descricaoData.forEach(function(item){
+              console.log(item.suplementar);
+              if(item.suplementar == 0){
+                if(item.tipo == "exp"){
+                  conteudo = item.descricao;
+                  conteudo = conteudo.replace("<p>","");
+                  conteudo = conteudo.replace("</p>","");
+                  exp_content = exp_content +'<strong>Item '+ exp_c + ' - </strong>' + conteudo + '. ';
+                  exp_c = exp_c + 1;
+
+                } else if(item.tipo == "ciencia"){
+                  conteudo = item.descricao;
+                  conteudo = conteudo.replace("<p>","");
+                  conteudo = conteudo.replace("</p>","");
+                  ciencia_content = ciencia_content +'<strong>Item '+ ciencia_c + ' - </strong>' + conteudo + '. ';
+                  ciencia_c = ciencia_c + 1;
+
+                } else if(item.tipo == "odia"){
+                  conteudo = item.descricao;
+                  conteudo = conteudo.replace("<p>","");
+                  conteudo = conteudo.replace("</p>","");
+                  odia_content = odia_content +'<strong>Item '+ odia_c + ' - </strong>' + conteudo + '. ';
+                  odia_c = odia_c + 1;
+
+                } else if(item.tipo == "homo"){
+                  conteudo = item.descricao;
+                  conteudo = conteudo.replace("<p>","");
+                  conteudo = conteudo.replace("</p>","");
+                  homo_content = homo_content +'<strong>Item '+ homo_c + ' - </strong>' + conteudo + '. ';
+                  homo_c = homo_c + 1;
+
+                }
+            } else {
+                if(suplementar_content == ""){
+                  suplementar_content = suplementar_content + "<strong>PAUTA SUPLEMENTAR: </strong> ATA DE REUNI&Atilde;O: " + reuniaoAntigaData[0].no +"&ordf; Reuni&atilde;o "+ tipoAntigo +" da Congrega&ccedil;&atilde;o, realizada no dia "+ dataAntiga + ". ";
+                }
+                if(item.tipo == "exp"){
+                  if(supl_exp_content == ""){
+                    supl_exp_content = supl_exp_content + "<strong>EXPEDIENTE: </strong>";
+                  }
+                  conteudo = item.descricao;
+                  conteudo = conteudo.replace("<p>","");
+                  conteudo = conteudo.replace("</p>","");
+                  supl_exp_content = supl_exp_content +'<strong>Item '+ supl_exp_c + ' - </strong>' + conteudo + '. ';
+                  supl_exp_c = supl_exp_c + 1;
+
+                } else if(item.tipo == "ciencia"){
+                  if(supl_ciencia_content == ""){
+                    supl_ciencia_content = supl_ciencia_content + "<strong>PARA CI&Ecirc;NCIA: </strong>";
+                  }
+                  conteudo = item.descricao;
+                  conteudo = conteudo.replace("<p>","");
+                  conteudo = conteudo.replace("</p>","");
+                  supl_ciencia_content = supl_ciencia_content +'<strong>Item '+ supl_ciencia_c + ' - </strong>' + conteudo + '. ';
+                  supl_ciencia_c = supl_ciencia_c + 1;
+
+                } else if(item.tipo == "odia"){
+                  if(supl_odia_content == ""){
+                    supl_odia_content = supl_odia_content + "<strong>ORDERM DO DIA. PARA APROVA&Ccedil;&Atilde;O: </strong>";
+                  }
+                  conteudo = item.descricao;
+                  conteudo = conteudo.replace("<p>","");
+                  conteudo = conteudo.replace("</p>","");
+                  supl_odia_content = supl_odia_content +'<strong>Item '+ supl_odia_c + ' - </strong>' + conteudo + '. ';
+                  supl_odia_c = supl_odia_c + 1;
+
+                } else if(item.tipo == "homo"){
+                  if(supl_homo_content == ""){
+                    supl_homo_content = supl_homo_content + "<strong>HOMOLOGA&Ccedil;&Atilde;O: </strong>";
+                  }
+                  conteudo = item.descricao;
+                  conteudo = conteudo.replace("<p>","");
+                  conteudo = conteudo.replace("</p>","");
+                  supl_homo_content = supl_homo_content +'<strong>Item '+ supl_homo_c + ' - </strong>' + conteudo + '. ';
+                  supl_homo_c = supl_homo_c + 1;
+
+                }
+              //console.log(item.descricao);
+              }
+            });
+
+            suplementar_content = suplementar_content + supl_exp_content + supl_ciencia_content + supl_odia_content + supl_homo_content;
+            console.log(exp_content);
+
+            template = '<h2><strong>ATA DA '+ ordinal[reuniaoData[0].no] +' REUNI&Atilde;O '+ tipo +' DA CONGREGA&Ccedil;&Atilde;O DO INSTITUTO DE COMPUTA&Ccedil;&Atilde;O, REALIZADA EM '+ data +'.</strong></h2>\
+              <p>O <span style="text-decoration: underline;"><strong>Sr. Presidente</strong></span> d&aacute; in&iacute;cio &agrave; '+ reuniaoData[0].no +'&ordf; Sess&atilde;o '+ tipo +' da Congrega&ccedil;&atilde;o de '+ ano +' e coloca em vota&ccedil;&atilde;o as Atas: '+ reuniaoAntigaData[0].no +'&ordf; Reuni&atilde;o '+ tipoAntigo +' da Congrega&ccedil;&atilde;o, realizada no dia '+ dataAntiga +'. <strong>APROVADA POR UNANIMIDADE. </strong>A seguir, o <span style="text-decoration: underline;"><strong>Sr. Presidente</strong></span> inicia o <strong>EXPEDIENTE: Item 1 - Informes Gerais:</strong> O<span style="text-decoration: underline;"><strong> Sr. Presidente </strong></span>informa: '+ informes +'. '+ exp_content +'. <strong>PARA CI&Ecirc;NCIA: </strong>'+ ciencia_content +'. O <span style="text-decoration: underline;"><strong>Sr. Presidente</strong></span> em seguida, entra na <strong>ORDEM DO DIA. DESTAQUES:. </strong>O <span style="text-decoration: underline;"><strong>Sr. Presidente</strong></span> coloca para vota&ccedil;&atilde;o em bloco os itens da <strong>ORDEM DO DIA. PARA APROVA&Ccedil;&Atilde;O: </strong>'+ odia_content +'. <strong>HOMOLOGA&Ccedil;&Atilde;O:</strong> '+ homo_content +''+ suplementar_content +' <strong>APROVADOS POR UNANIMIDADE. </strong>O <span style="text-decoration: underline;"><strong>Sr. Presidente</strong></span> abre para discuss&atilde;o os <strong>DESTAQUES</strong>.</p>';
+              tinymce.get("gera_doc_content").setContent(template);
+            } else {
+              tinymce.get("gera_doc_content").setContent(reuniaoData[0].pauta);
+            }
+            $("#gera_doc_modal").modal();
+        });
+      });
+    });
+  }
+}
+
+function novaReuniao(){
+
 }
 
 </script>
@@ -393,13 +840,19 @@ function geraDoc(tipo){
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
         <h4 class="modal-title" style="font-weight: bold;"></h4>
       </div>
-      <div class="modal-body" style="background: #637f83;">
-        <textarea id="item_info_descricao" name="descricao" ></textarea>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal" style="padding: 12px; font-size: 0.8125em; float: left;">Fechar</button>
-        <button type="button" id="item_info_copy" class="btn btn-primary item_info_btn" style="float: right;" onclick="">Salvar</button>
-      </div>
+      <form id="gera_doc_form" class="busca-avancada" action="<?php echo URL; ?>solr/salvaDoc" method="POST" style="height: 100%;">
+        <div class="modal-body" style="background: #637f83;">
+          <textarea id="gera_doc_content" name="content" ></textarea>
+        </div>
+        <div class="modal-footer">
+          <input id="gera_doc_hidden_tipo" type="hidden" name="tipo" value="">
+          <input id="gera_doc_hidden_num" type="hidden" name="num_reuniao" value="">
+          <input id="gera_doc_hidden_ano" type="hidden" name="ano_reuniao" value="">
+          <input id="gera_doc_hidden_name" type="hidden" name="item_name" value="">
+          <button type="button" class="btn btn-default" data-dismiss="modal" style="padding: 12px; font-size: 0.8125em; float: left;">Fechar</button>
+          <input type="submit" class="btn btn-primary item_info_btn" name="envia" value="Salvar" style="position: static;">
+        </div>
+      </form>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
@@ -492,12 +945,13 @@ function geraDoc(tipo){
             <input type="hidden" name="ano_reuniao" value="<?php echo $cur_ano_reuniao; ?>">
         </div>
         <div class="modal-footer">
-          <button id="gera_deliberacao" type="button" class="btn btn-primary item_info_btn" style="float: left;" onclick="geraDoc('deliberacao');">Gerar Deliberação</button>
-          <button id="gera_homologacao" type="button" class="btn btn-primary item_info_btn" style="float: left;" onclick="geraDoc('homologacao');">Gerar Homologação</button>
-          <button id="gera_informacao" type="button" class="btn btn-primary item_info_btn" style="float: left;" onclick="geraDoc('informacao');">Gerar Informação</button>
+          <button id="gera_deliberacao" type="button" class="btn btn-primary item_info_btn" style="float: left;">Gerar Deliberação</button>
+          <button id="gera_homologacao" type="button" class="btn btn-primary item_info_btn" style="float: left;">Gerar Homologação</button>
+          <button id="gera_informacao" type="button" class="btn btn-primary item_info_btn" style="float: left;">Gerar Informação</button>
           <button type="button" id="item_info_copy" class="btn btn-primary item_info_btn" style="float: left;" onclick="copyItem();">Gerar Item a partir deste</button>
+          <input  type="submit" class="btn btn-primary item_info_btn" name="envia" value="Baixar Anexos" style="float: left; position: static; font-weight: normal; font-size: 1.1em;">
           <button type="button" class="btn btn-default" data-dismiss="modal" style="padding: 12px; font-size: 0.8125em;">Fechar</button>
-          <input type="submit" class="btn btn-primary item_info_btn" name="envia" value="Salvar" style="position: static;">
+          <input type="submit" class="btn btn-primary item_info_btn" name="envia" value="Salvar" style="position: static; font-weight: normal; font-size: 1.1em;">
         </div>
       </form>
     </div><!-- /.modal-content -->
@@ -709,7 +1163,7 @@ function geraDoc(tipo){
           <div class="clearfix"> </div>
         </ul>
         <div>
-          <form class="busca-avancada" action="<?php echo URL; ?>solr/geraDoc" method="POST">
+          <form class="busca-avancada" action="" method="POST">
             <div id="informes_div" class="form-group footer_head_notaligned">
               <label>Informes Gerais</label>
 
@@ -794,7 +1248,7 @@ function geraDoc(tipo){
                 foreach($InUse as $item){
                   if(($item->ano_reuniao == $cur_ano_reuniao) && ($item->num_reuniao == $cur_num_reuniao) && ("exp" == $item->tipo)){
                     echo "<li id=\"busca$busca_n"."_$item->tipo\" class=\"item_pauta_$item->tipo dbclick click\" draggable=\"true\" ondragstart=\"drag(event)\"> $item->name &emsp;&emsp; $item->num_reuniao/$item->ano_reuniao</li>";
-                    echo "<input type=\"hidden\" name=\"busca$busca_n"."_$item->tipo\" value=\"$item->name\">";
+                    //echo "<input type=\"hidden\" name=\"busca$busca_n"."_$item->tipo\" value=\"$item->name\">";
                   }
                 }
                 ?>
@@ -808,7 +1262,7 @@ function geraDoc(tipo){
                 foreach($InUse as $item){
                   if(($item->ano_reuniao == $cur_ano_reuniao) && ($item->num_reuniao == $cur_num_reuniao) && ("ciencia" == $item->tipo)){
                     echo "<li id=\"busca$busca_n"."_$item->tipo\" class=\"item_pauta_$item->tipo dbclick click\" draggable=\"true\" ondragstart=\"drag(event)\"> $item->name &emsp;&emsp; $item->num_reuniao/$item->ano_reuniao</li>";
-                    echo "<input type=\"hidden\" name=\"busca$busca_n"."_$item->tipo\" value=\"$item->name\">";
+                    //echo "<input type=\"hidden\" name=\"busca$busca_n"."_$item->tipo\" value=\"$item->name\">";
                   }
                 }
                 ?>
@@ -822,7 +1276,7 @@ function geraDoc(tipo){
                 foreach($InUse as $item){
                   if(($item->ano_reuniao == $cur_ano_reuniao) && ($item->num_reuniao == $cur_num_reuniao) && ("odia" == $item->tipo)){
                     echo "<li id=\"busca$busca_n"."_$item->tipo\" class=\"item_pauta_$item->tipo dbclick click\" draggable=\"true\" ondragstart=\"drag(event)\"> $item->name &emsp;&emsp; $item->num_reuniao/$item->ano_reuniao</li>";
-                    echo "<input type=\"hidden\" name=\"busca$busca_n"."_$item->tipo\" value=\"$item->name\">";
+                    //echo "<input type=\"hidden\" name=\"busca$busca_n"."_$item->tipo\" value=\"$item->name\">";
                   }
                 }
                 ?>
@@ -836,7 +1290,7 @@ function geraDoc(tipo){
                 foreach($InUse as $item){
                   if(($item->ano_reuniao == $cur_ano_reuniao) && ($item->num_reuniao == $cur_num_reuniao) && ("homo" == $item->tipo)){
                     echo "<li id=\"busca$busca_n"."_$item->tipo\" class=\"item_pauta_$item->tipo dbclick click\" draggable=\"true\" ondragstart=\"drag(event)\"> $item->name &emsp;&emsp; $item->num_reuniao/$item->ano_reuniao</li>";
-                    echo "<input type=\"hidden\" name=\"busca$busca_n"."_$item->tipo\" value=\"$item->name\">";
+                    //echo "<input type=\"hidden\" name=\"busca$busca_n"."_$item->tipo\" value=\"$item->name\">";
                   }
                 }
                 ?>
@@ -848,15 +1302,15 @@ function geraDoc(tipo){
                   <input type="button" name="item" value="Novo Item" onclick="addItem();"/>
                 </div>
                 <div class="col-md-4" style="margin: 0px;">
-                  <input type="submit" name="pauta" value="Gerar Pauta" />
+                  <input type="button" name="pauta" value="Gerar Pauta" onclick="geraPauta();"/>
                 </div>
               </div>
               <div class="row" style="height: 3em;">
                 <div class="col-md-4" style="margin: 0px;">
-                  <input type="submit" name="ata" value="Gerar Ata"/>
+                  <input type="button" name="ata" value="Gerar Ata"onclick="geraAta();"/>
                 </div>
                 <div class="col-md-4" style="margin: 0px;">
-                  <input type="submit" name="deliberacao" value=" Nova Reunião"/>
+                  <input type="button" name="nova_reuniao" value=" Nova Reunião" onclick="novaReuniao();"/>
                 </div>
               </div>
             </div>
