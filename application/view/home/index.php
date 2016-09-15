@@ -113,23 +113,23 @@
 
                         $mes_num = $document["indexingmonth_s"];
 
-                        if($mes_num == 01){
+                        if($mes_num == 1){
                         $mes_nome = "Janeiro";
-                        }elseif($mes_num == 02){
+                        }elseif($mes_num == 2){
                         $mes_nome = "Fevereiro";
-                        }elseif($mes_num == 03){
+                        }elseif($mes_num == 3){
                         $mes_nome = "Março";
-                        }elseif($mes_num == 04){
+                        }elseif($mes_num == 4){
                         $mes_nome = "Abril";
-                        }elseif($mes_num == 05){
+                        }elseif($mes_num == 5){
                         $mes_nome = "Maio";
-                        }elseif($mes_num == 06){
+                        }elseif($mes_num == 6){
                         $mes_nome = "Junho";
-                        }elseif($mes_num == 07){
+                        }elseif($mes_num == 7){
                         $mes_nome = "Julho";
-                        }elseif($mes_num == 08){
+                        }elseif($mes_num == 8){
                         $mes_nome = "Agosto";
-                        }elseif($mes_num == 09){
+                        }elseif($mes_num == 9){
                         $mes_nome = "Setembro";
                         }elseif($mes_num == 10){
                         $mes_nome = "Outubro";
