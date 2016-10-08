@@ -28,8 +28,8 @@
 
   <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js" type="text/javascript"></script>
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" type="text/javascript"></script>
-  <script src="<?php echo URL; ?>js/jquery.toaster.js"></script>
-  <script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
+  <script src="<?php echo URL; ?>js/jquery.toaster.js" type="text/javascript"></script>
+  <script src="//cdn.tinymce.com/4/tinymce.min.js" type="text/javascript"></script>
   <script>tinymce.init({ 
     selector:'textarea',
     height: 500,
@@ -39,7 +39,6 @@
     'insertdatetime table contextmenu paste'
     ]
     });</script>
-  <script src="<?php echo URL; ?>js/fileDownload.js" type="text/javascript"></script>
 
   <!-- Start my scripts -->
   <script>
@@ -219,9 +218,10 @@
             else
               $("#squaredOne").prop("checked", true);
 
-            var dia = reuniaoData[0].data.split("-")[2];
-            var mes = reuniaoData[0].data.split("-")[1];
-            var ano = reuniaoData[0].data.split("-")[0];
+            var onlydate = reuniaoData[0].data.split(" ")[0];
+            var dia = onlydate.split("-")[2];
+            var mes = onlydate.split("-")[1];
+            var ano = onlydate.split("-")[0];
 
             $("#item_info_reuniao").html(reuniaoData[0].num +'/'+ reuniaoData[0].ano +'&emsp;'+ reuniaoData[0].no + '&ordf; Reunião ' + reuniaoData[0].tipo + ' --- ' + dia +'/'+ mes +'/'+ ano);
 
@@ -229,24 +229,31 @@
               $("#gera_deliberacao").hide();
               $("#gera_informacao").hide();
               $("#gera_homologacao").hide();
+              $("#item_info_seq").hide();
 
             } else if(data.item_info[0].tipo === "ciencia"){
               $("#gera_deliberacao").hide();
               $("#gera_homologacao").hide();
               $("#gera_informacao").show();
+              $("#item_info_seq").show();
               $("#gera_informacao").attr("onclick", "").attr("onclick", "geraDoc('INFORMA&Ccedil;&Atilde;O', "+jsonData+", "+jsonReuniaoData+");");
+              $("#item_info_last_seq").html("<?php echo $seq_num_ciencia . ' / ' . $seq_ano_ciencia; ?>");
 
             } else if(data.item_info[0].tipo === "odia"){
               $("#gera_informacao").hide();
               $("#gera_homologacao").hide();
               $("#gera_deliberacao").show();
+              $("#item_info_seq").show();
               $("#gera_deliberacao").attr("onclick", "").attr("onclick", "geraDoc('DELIBERA&Ccedil;&Atilde;O', "+jsonData+", "+jsonReuniaoData+");");
+              $("#item_info_last_seq").html("<?php echo $seq_num_odia . ' / ' . $seq_ano_odia; ?>");
 
             } else if(data.item_info[0].tipo === "homo"){
               $("#gera_deliberacao").hide();
               $("#gera_informacao").hide();
               $("#gera_homologacao").show();
+              $("#item_info_seq").show();
               $("#gera_homologacao").attr("onclick", "").attr("onclick", "geraDoc('HOMOLOGA&Ccedil;&Atilde;O', "+jsonData+", "+jsonReuniaoData+");");
+              $("#item_info_last_seq").html("<?php echo $seq_num_homo . ' / ' . $seq_ano_homo; ?>");
 
             }
 
@@ -326,7 +333,7 @@
 function addNewFile(elem, clearfixid){
   var filename = $(elem).val().replace(/^.*[\\\/]/, '');
   $(elem).hide();
-  $(elem).prop("name", filename);
+  $(elem).prop("name", "item_attachs[]");
   $('<input class="form-control" type="file" value="" onchange="if(validateSingleInput2(this)) addNewFile(this,\''+clearfixid+'\');" style="margin-bottom: 2%;" />').insertAfter($(elem));
   $('<li class="item_info_file" style="width: 85%;"> <img src="<?php echo URL; ?>images/pdf-icon.gif" alt="image"/> &emsp; ' + filename + '</li>\
     <li style="display: inline; margin-top:8px; margin-left: 5px;">\
@@ -351,9 +358,10 @@ function addItem(){
 
   jQuery.post("<?php echo URL; ?>solr/get_reuniao_info", {arguments: [num_reuniao, ano_reuniao]}, function(data){
     var reuniaoData = JSON.parse(data);
-    var dia = reuniaoData[0].data.split("-")[2];
-    var mes = reuniaoData[0].data.split("-")[1];
-    var ano = reuniaoData[0].data.split("-")[0];
+    var onlydate = reuniaoData[0].data.split(" ")[0]
+    var dia = onlydate.split("-")[2];
+    var mes = onlydate.split("-")[1];
+    var ano = onlydate.split("-")[0];
 
     $("#insere_item_reuniao").html(reuniaoData[0].num +'/'+ reuniaoData[0].ano +'&emsp;'+ reuniaoData[0].no + '&ordf; Reunião ' + reuniaoData[0].tipo + ' --- ' + dia +'/'+ mes +'/'+ ano);
     $("#insere_item_ano_reuniao").val(ano_reuniao);
@@ -395,9 +403,11 @@ function makeString(object) {
   if (object == null) return '';
   return String(object);
 };
+
 function escapeRegExp(str) {
   return makeString(str).replace(/([.*+?^=!:${}()|[\]\/\\])/g, '\\$1');
 };
+
 function defaultToWhiteSpace(characters) {
   if (characters == null)
     return '\\s';
@@ -406,6 +416,7 @@ function defaultToWhiteSpace(characters) {
   else
     return '[' + escapeRegExp(characters) + ']';
 };
+
 function myltrim(str, characters) {
   var nativeTrimLeft = String.prototype.trimLeft;
   str = makeString(str);
@@ -414,6 +425,7 @@ function myltrim(str, characters) {
   characters = defaultToWhiteSpace(characters);
   return str.replace(new RegExp('^' + characters + '+'), '');
 };
+
 function mytrim(str, characters) {
   var nativeTrim = String.prototype.trim;
   str = makeString(str);
@@ -422,6 +434,7 @@ function mytrim(str, characters) {
   characters = defaultToWhiteSpace(characters);
   return str.replace(new RegExp('^' + characters + '+|' + characters + '+$', 'g'), '');
 };
+
 function myrtrim(str, characters) {
   var nativeTrimRight = String.prototype.trimRight;
   str = makeString(str);
@@ -440,9 +453,11 @@ function geraDoc(tipoDoc, itemData, reuniaoData){
 
   if(itemData.item_info[0].documento == null){
     var tipo  = reuniaoData[0].tipo.replace(/á/g, '&aacute;').replace(/Á/g, '&Aacute;');
-    var dia = reuniaoData[0].data.split("-")[2];
-    var mes = reuniaoData[0].data.split("-")[1];
-    var ano = reuniaoData[0].data.split("-")[0];
+
+    var onlydate = reuniaoData[0].data.split(" ")[0];
+    var dia = onlydate.split("-")[2];
+    var mes = onlydate.split("-")[1];
+    var ano = onlydate.split("-")[0];
     var data = dia + "/" + mes + "/" + ano;
 
     var seq = itemData.item_info[0].seq_num + "/" + itemData.item_info[0].seq_ano;
@@ -827,11 +842,98 @@ function geraAta(){
 }
 
 function novaReuniao(){
-
+  $("#nova_reuniao_modal").modal();
 }
 
 </script>
 <!-- End my scripts -->
+
+<<div id="nova_reuniao_modal" class="modal modal-wide fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" style="font-weight: bold;">Nova Reunião</h4>
+      </div>
+      <form id="nova_reuniao_form" class="busca-avancada" action="<?php echo URL; ?>solr/criaReuniao" method="POST" style="height: 100%;" enctype="multipart/form-data">
+        <div class="modal-body" style="background: #637f83;">
+          <div class="col-md-2" style="height: 80%; display: none;">
+            <ul id="nova_reuniao_historico" class="twitter img-rounded" style="padding-bottom: 4em; height: 100%;">
+              <label style="color: white;">Histórico de Alterações:</label>
+            </ul>
+          </div>
+          <div class="col-md-5" style="height: 100%; margin-left: 8%;">
+            <div class="form-group" style="border-bottom: 1px solid #597275; padding-bottom: 2%;">
+              <label style="font-size: large; font-style: italic;"> N&ordm; de Ordem: </label>
+              <div class="row" style="margin-left: 0.2%;">
+                <input style="width:5%;" id="nova_reuniao_no" class="form-control col-md-1" type="number" name="no" value="" />
+                <label style="font-size: xx-large; font-weight: 200;"> &ordf;</label>
+              </div>
+            </div>
+            <div class="form-group" style="border-bottom: 1px solid #597275; padding-bottom: 2%;">
+              <label style="font-size: large; font-style: italic;"> Tipo: </label>
+              <select class="form-control" name="tipo">
+                <option value="">Nenhum</option>
+                <option id="nova_reuniao_ord" value="Ordinária">Ordinária</option>
+                <option id="nova_reuniao_extr" value="Extraordinária">Extraordinária</option>
+              </select>
+            </div>
+            <div class="form-group" style="border-bottom: 1px solid #597275; padding-bottom: 2%;">
+              <div class="row" style="padding-left: 0.8em;">
+                <label style="font-size: large; font-style: italic; margin-bottom: 2%;"> Dados de Referência: </label>
+              </div>
+              <div class="row">
+                <label style="margin-top: 1%; font-weight: normal; font-size: large; float: left; padding-left: 2%;"> N&ordm; de Referência:  </label>
+                <div class="col-md-2" style="width: 4.5em;">
+                  <input id="nova_reuniao_num_reuniao" class="form-control" type="number" name="num_reuniao" value="" style="width: 100%;font-size: 1em;" max="31" min="1" placeholder="<?php echo $cur_num_reuniao; ?>" />
+                </div>
+                <h1 class="col-md-1" style="color: white; padding: 0px; margin-top: 0.07em; width: 0.4em;">/</h1>
+                <div class="col-md-4" style="width: 5.5em;">
+                  <input id="nova_reuniao_ano_reuniao" class="form-control" type="number" name="ano_reuniao" value="" style="width: 100%; font-size: 1em;" max="2100" min="2014" placeholder="<?php echo $cur_ano_reuniao; ?>"/>
+                </div>
+              </div>
+              <div class="row" style="margin-bottom: 1%;">
+                <label style="font-weight: normal; font-size: large; float: left; padding-left: 2%; margin-right: 3%;"> N&ordm; de Referência da Reunião Passada:  </label>
+                <label  id="nova_reuniao_passada" style="font-weight: normal; font-size: larger; color: #4c4c4c;"><?php echo $cur_num_reuniao; ?> / <?php echo $cur_ano_reuniao; ?> </label>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-5" style="height: 100%;">
+            <div class="form-group" style="border-bottom: 1px solid #597275; padding-bottom: 2%;">
+                <label style="font-size: large; font-style: italic;"> Data e Horário em que a Reunião acontecerá: </label>
+                <div class="row">
+                  <input id="nova_reuniao_data" class="form-control col-md-3" type="date" name="data" value="" style="width: 25%;font-size: 1em;"/>
+                  <input id="nova_reuniao_data" class="form-control col-md-2" type="time" name="hora" value="" style="width: 15%;font-size: 1em;"/>
+                </div>
+            </div>
+            <div class="form-group" style="border-bottom: 1px solid #597275; padding-bottom: 2%;">
+              <div class="row" style="width: 5.5em;">
+                <label style="font-size: large; font-style: italic;"> Local (N&ordm; da Sala): </label>
+                <input id="nova_reuniao_local" class="form-control" type="number" name="local" value="" style="width: 100%; font-size: 1em;"/>
+              </div>
+            </div>
+            <div class="form-group" style="border-bottom: 1px solid #597275; padding-bottom: 2%;">
+              <div class="row">
+                <label style="margin-top: 1%; font-weight: normal; font-size: large; float: left; padding-left: 2%;"> N&ordm; de Referência da Última Reunião:  </label>
+                <div class="col-md-2" style="width: 4.5em;">
+                  <input id="nova_reuniao_num_passada" class="form-control" type="number" name="num_reuniao_ant" value="<?php echo $cur_num_reuniao; ?>" style="width: 100%;font-size: 1em;" max="31" min="1" />
+                </div>
+                <h1 class="col-md-1" style="color: white; padding: 0px; margin-top: 0.07em; width: 0.4em;">/</h1>
+                <div class="col-md-4" style="width: 5.5em;">
+                  <input id="nova_reuniao_ano_passada" class="form-control" type="number" name="ano_reuniao_ant" value="<?php echo $cur_ano_reuniao; ?>" style="width: 100%; font-size: 1em;" max="2100" min="2014"/>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal" style="padding: 12px; font-size: 0.8125em;">Fechar</button>
+          <input type="submit" class="btn btn-primary item_info_btn" name="envia" value="Criar" style="position: static;">
+        </div>
+      </form>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 <div id="gera_doc_modal" class="modal modal-wide fade">
   <div class="modal-dialog">
@@ -902,7 +1004,7 @@ function novaReuniao(){
                  <label  id="item_info_reuniao" style="padding-left: 2em; font-weight: normal; font-size: larger; color: #4c4c4c;"> </label>
                </div>
               </div>
-              <div class="form-group" style="border-bottom: 1px solid #597275; padding-bottom: 2%;">
+              <div id="item_info_seq" class="form-group" style="border-bottom: 1px solid #597275; padding-bottom: 2%;">
                 <div class="row" style="padding-left: 0.8em;">
                   <label style="font-size: large; font-style: italic;"> Numero de Sequência: </label>
                 </div>
@@ -915,6 +1017,12 @@ function novaReuniao(){
                     <input id="item_info_seq_ano" class="form-control" type="number" name="ano_seq" value="" style="width: 100%; font-size: 1em;" max="2100" min="2014"/>
                   </div>
                 </div>
+                <div class="row" style="padding-left: 0.8em;">
+                  <label style="font-size: large; font-style: italic;"> Último Numero de Sequência: </label>
+                </div>
+                <div class="row">
+                 <label  id="item_info_last_seq" style="padding-left: 2em; font-weight: normal; font-size: larger; color: #4c4c4c;"> </label>
+               </div>
               </div>
               <div class="form-group">
                 <label style="font-size: large; font-style: italic;">Arquivos Anexados: </label>
@@ -1013,7 +1121,7 @@ function novaReuniao(){
                 <label  id="insere_item_reuniao" style="padding-left: 2em; font-weight: normal; font-size: larger; color: #4c4c4c;"> </label>
               </div>
             </div>
-            <div class="form-group" style="border-bottom: 1px solid #597275; padding-bottom: 2%;">
+            <!-- <div class="form-group" style="border-bottom: 1px solid #597275; padding-bottom: 2%;">
               <div class="row" style="padding-left: 0.8em;">
                 <label style="font-size: large; font-style: italic;"> Número de Sequência: </label>
               </div>
@@ -1026,7 +1134,7 @@ function novaReuniao(){
                   <input id="insere_item_seq_ano" class="form-control" type="number" name="ano_seq" value="" style="width: 100%; font-size: 1em;" max="2100" min="2014" readonly/>
                 </div>
               </div>
-            </div>
+            </div> -->
             <div class="form-group">
               <label style="font-size: large; font-style: italic;">Arquivos Anexados: </label>
               <ul id="insere_item_file_list" class="twitter img-rounded" style="background: #637f83; padding-left: 0px;">
@@ -1037,14 +1145,14 @@ function novaReuniao(){
             </div>
           </div>
           <div class="col-md-5" style="height: 100%;">
-            <div class="form-group" style="border-bottom: 1px solid #597275; padding-bottom: 2%;">
+            <!-- <div class="form-group" style="border-bottom: 1px solid #597275; padding-bottom: 2%;">
               <div class="row" style="padding-left: 0.8em;">
                 <label style="font-size: large; font-style: italic;"> Data e Hora da última alteração: </label>
               </div>
               <div class="row">
                 <label  id="insere_item_datahora" style="padding-left: 2em; font-weight: normal; font-size: larger; color: #4c4c4c;"> </label>
               </div>
-            </div>
+            </div> -->
             <div class="form-group" style="height: 70%;">
               <label style="font-size: large; font-style: italic;"> Descrição: </label>
               <textarea id="insere_item_descricao" name="descricao" value="" cols="0" rows="5" class="descricao_textarea" placeholder="Descrever de forma detalhada sobre o que se trata este item."></textarea>
@@ -1052,7 +1160,7 @@ function novaReuniao(){
           </div>
 
           <input type="hidden" name="num_seq" value="-1">
-          <input type="hidden" name="ano_ano" value="-1">
+          <input type="hidden" name="ano_seq" value="-1">
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal" style="padding: 12px; font-size: 0.8125em;">Fechar</button>

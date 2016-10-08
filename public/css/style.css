@@ -516,6 +516,7 @@ ul.message li.msg-desc p{
 	line-height: inherit;
 }
 .busca-avancada input[type="text"],
+.busca-avancada input[type="time"],
 .busca-avancada input[type="date"],
 .busca-avancada input[type="file"],
 .subscribe input[type="text"],
@@ -540,6 +541,7 @@ ul.message li.msg-desc p{
 .busca-avancada input[type="text"],
 .busca-avancada input[type="date"],
 .busca-avancada input[type="file"],
+.busca-avancada input[type="time"],
 .busca-avancada input[type="submit"],
 .busca-avancada input[type="button"],
 .busca-avancada select,

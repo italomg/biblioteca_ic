@@ -69,8 +69,22 @@ class Solr extends Controller
    $busca_n = 1;
    $reuniao = $this->model->get_ultima_reuniao();
    $reuniao = array_values(get_object_vars($reuniao[0]));
-   $cur_ano_reuniao = $reuniao[1];
-   $cur_num_reuniao = $reuniao[0];
+   $cur_ano_reuniao = intval($reuniao[1]);
+   $cur_num_reuniao = intval($reuniao[0]);
+
+   $seq_exp = $this->model->getLastSeq("exp");
+   $seq_ciencia = $this->model->getLastSeq("ciencia");
+   $seq_odia = $this->model->getLastSeq("odia");
+   $seq_homo = $this->model->getLastSeq("homo");
+
+   $seq_num_ciencia = intval($seq_ciencia[0]->{"max(seq_num)"});
+   $seq_ano_ciencia = intval($seq_ciencia[0]->{"max(seq_ano)"});
+
+   $seq_num_odia = intval($seq_odia[0]->{"max(seq_num)"});
+   $seq_ano_odia = intval($seq_odia[0]->{"max(seq_ano)"});
+
+   $seq_num_homo = intval($seq_homo[0]->{"max(seq_num)"});
+   $seq_ano_homo = intval($seq_homo[0]->{"max(seq_ano)"});
 
 
    if($nome == '' && $tipo == '' && $ano_reuniao == -1 && $num_reuniao == -1){
@@ -259,43 +273,94 @@ echo json_encode($aResult);
 echo json_encode($rowMod);
 }
 
-public function salvaItem(){
-    //var_dump($_POST);
+public function criaReuniao(){
 
-  $name = $_POST["nome"];
-  unset($_POST["nome"]);
+  if(count($_POST) >= 6){  
+    $no = $_POST["no"];
+    unset($_POST["no"]);
 
-  $num_reuniao = intval($_POST["num_reuniao"]);
-  unset($_POST["num_reuniao"]);
+    $tipo = $_POST["tipo"];
+    unset($_POST["tipo"]);
 
-  $ano_reuniao = intval($_POST["ano_reuniao"]);
-  unset($_POST["ano_reuniao"]);
+    $num_reuniao = intval($_POST["num_reuniao"]);
+    unset($_POST["num_reuniao"]);
 
-  $tipo = $_POST["tipo"];
-  unset($_POST["tipo"]);
+    $ano_reuniao = intval($_POST["ano_reuniao"]);
+    unset($_POST["ano_reuniao"]);
 
-  $num_seq = intval($_POST["num_seq"]);
-  unset($_POST["num_seq"]);
+    $data = $_POST["data"];
+    unset($_POST["data"]);
 
-  $ano_seq = intval($_POST["ano_seq"]);
-  unset($_POST["ano_seq"]);
+    $hora = $_POST["hora"];
+    unset($_POST["hora"]);
+    $hora = $hora . ":00";
 
-  if(isset($_POST["suplementar"])){
-    $suplementar = $_POST["suplementar"];
-    unset($_POST["suplementar"]);
-  } else{
-    $suplementar = "nao";
+    $local = $_POST["local"];
+    unset($_POST["local"]);
+
+    $num_reuniao_ant = $_POST["num_reuniao_ant"];
+    unset($_POST["num_reuniao_ant"]);
+
+    $ano_reuniao_ant = $_POST["ano_reuniao_ant"];
+    unset($_POST["ano_reuniao_ant"]);
+
+    $datahora = $data . " " . $hora;
+
+    //echo $tipo;
+
+    $this->model->criaReuniao($no, $num_reuniao, $ano_reuniao, $datahora, $local, $num_reuniao_ant, $ano_reuniao_ant, $tipo);
   }
 
-  $descricao = $_POST["descricao"];
-  unset($_POST["descricao"]);
+  // where to go after file has been added
+  header('location: ' . URL . 'solr/schedule');
+
+  // Cache dump
+  header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+  header("Cache-Control: post-check=0, pre-check=0", false);
+  header("Pragma: no-cache");
+
+
+}
+
+public function salvaItem(){
+  //var_dump($_POST);
+  //var_dump($_FILES);
+
+  if(count($_POST) >= 6){
+    $suplementar = "nao";
+
+    $name = $_POST["nome"];
+    unset($_POST["nome"]);
+
+    $num_reuniao = intval($_POST["num_reuniao"]);
+    unset($_POST["num_reuniao"]);
+
+    $ano_reuniao = intval($_POST["ano_reuniao"]);
+    unset($_POST["ano_reuniao"]);
+
+    $tipo = $_POST["tipo"];
+    unset($_POST["tipo"]);
+
+    $num_seq = intval($_POST["num_seq"]);
+    unset($_POST["num_seq"]);
+
+    $ano_seq = intval($_POST["ano_seq"]);
+    unset($_POST["ano_seq"]);
+
+    if(isset($_POST["suplementar"])){
+      $suplementar = $_POST["suplementar"];
+      unset($_POST["suplementar"]);
+    }
+
+    $descricao = $_POST["descricao"];
+    unset($_POST["descricao"]);
+  }
 
   $files = array();
-  foreach($_FILES as $file){
-    $files[] = basename($file['name']);
+  foreach($_FILES["item_attachs"]["name"] as $file){
+    $files[] = basename($file);
   }
-
-  //TODO adicionar cada um dos arquivos
+  
   if($_POST["envia"] == "Salvar"){
     $this->model->update_item($name, $num_reuniao, $ano_reuniao, $tipo, $num_seq, $ano_seq, $suplementar, $files, $descricao);
     $this->enviarArquivoParam($files);
@@ -329,7 +394,7 @@ public function salvaItem(){
       if(is_file('download/' . $file->file_name))
         array_push($files, 'download/' . $file->file_name);
     }
-    $zipname = 'file.zip';
+    $zipname = 'anexos.zip';
     $zip = new ZipArchive;
     $zip->open($zipname, ZipArchive::CREATE);
     foreach ($files as $filename) {
@@ -352,17 +417,16 @@ public function enviarArquivoParam($files){
   date_default_timezone_set('America/Sao_Paulo');
   $creation = date('Y-m-d_H-i-s');
   //var_dump($_FILES);
-  foreach ($files as $filename) {
-    $fpath = $this->oneFileUpload($filename, $creation, 0);
+  for($i = 0; $i < count($_FILES["item_attachs"]['name']); $i++){
+    $fpath = $this->oneFileUpload($i, $creation);
     $this->indexaArquivo($fpath, $filename, false, "");
   }
 }
 
-public function oneFileUpload($filename, $creation)
+public function oneFileUpload($index, $creation)
 {
     // if we have an id that should be edited
-  $find = array(" ", ".");
-  if ($_FILES[str_replace($find, "_", $filename)]['error'] == 0) {
+  if ($_FILES["item_attachs"]['error'][$index] == 0) {
 
     $upload_dir = 'download';
 
@@ -370,14 +434,15 @@ public function oneFileUpload($filename, $creation)
       mkdir($upload_dir, 0755, true);
     }
 
-    $target_file = $upload_dir . '/' . basename($_FILES[str_replace($find, "_", $filename)]['name']);
+    $target_file = $upload_dir . '/' . basename($_FILES["item_attachs"]['name'][$index]);
 
-    if ( !move_uploaded_file($_FILES[str_replace($find, "_", $filename)]["tmp_name"], $target_file) ) {
+    if ( !move_uploaded_file($_FILES["item_attachs"]["tmp_name"][$index], $target_file) ) {
       return null;
     }
 
     return $target_file;
   }
+
 }
 
 public function get_descricoes(){

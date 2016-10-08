@@ -58,6 +58,14 @@ class Model
       return $query->fetchAll();
     }
 
+    public function getLastSeq($tipo){
+      $sql = "SELECT max(seq_num), max(seq_ano) FROM itens WHERE tipo = \"". $tipo ."\"";
+      $query = $this->db->prepare($sql);
+
+      $query->execute();
+      return $query->fetchAll();
+    }
+
     public function get_reuniao($num_reuniao, $ano_reuniao){
 
       $sql = "SELECT * FROM reunioes WHERE num = :num_reuniao AND ano = :ano_reuniao";
@@ -195,10 +203,10 @@ class Model
 
       $sql = "";
       if($suplementar == "sim"){
-        $sql = "UPDATE itens SET date = NOW(), seq_num = :num_seq, seq_ano = :ano_seq, tipo = :tipo, descricao = :descricao, in_use = false, suplementar = true, latest = true WHERE name = :name AND num_reuniao = :num_reuniao AND ano_reuniao = :ano_reuniao";
+        $sql = "UPDATE itens SET date = NOW(), seq_num = :num_seq, seq_ano = :ano_seq, tipo = :tipo, descricao = :descricao, suplementar = true, latest = true WHERE name = :name AND num_reuniao = :num_reuniao AND ano_reuniao = :ano_reuniao";
       }
       else{
-        $sql = "UPDATE itens SET date = NOW(), seq_num = :num_seq, seq_ano = :ano_seq, tipo = :tipo, descricao = :descricao, in_use = false, suplementar = false, latest = true WHERE name = :name AND num_reuniao = :num_reuniao AND ano_reuniao = :ano_reuniao";
+        $sql = "UPDATE itens SET date = NOW(), seq_num = :num_seq, seq_ano = :ano_seq, tipo = :tipo, descricao = :descricao, suplementar = false, latest = true WHERE name = :name AND num_reuniao = :num_reuniao AND ano_reuniao = :ano_reuniao";
       }
       $query = $this->db->prepare($sql);
       $parameters = array(':name' => $name, ':num_reuniao' => $num_reuniao, ':ano_reuniao' => $ano_reuniao, ':num_seq' => $num_seq, ':ano_seq' => $ano_seq, ':tipo' => $tipo, ':descricao' => $descricao);
@@ -259,6 +267,13 @@ class Model
       
 
       return $query->rowCount(); 
+    }
+
+    public function criaReuniao($no, $num_reuniao, $ano_reuniao, $datahora, $local, $num_reuniao_ant, $ano_reuniao_ant, $tipo){
+      $sql = "INSERT INTO reunioes VALUES(:num_reuniao, :ano_reuniao, :tipo, :no, :datahora, :local, :num_reuniao_ant, :ano_reuniao_ant, NULL, NULL)";
+      $query = $this->db->prepare($sql);
+      $parameters = array(':no' => $no, ':num_reuniao' => $num_reuniao, ':ano_reuniao' => $ano_reuniao, ':datahora' => $datahora, ':local' => $local, ':tipo' => $tipo, ':num_reuniao_ant' => $num_reuniao_ant, ':ano_reuniao_ant' => $ano_reuniao_ant);
+      $query->execute($parameters);
     }
 
     //Parametrizar esta funcao no futuro
